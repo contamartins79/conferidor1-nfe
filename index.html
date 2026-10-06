@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conferidor de NF-e Portátil</title>
+
+    <!-- Biblioteca correta do leitor de código de barras -->
+    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+
+    <style>
+        :root {
+            --primary: #2563eb;
+            --success: #16a34a;
+            --warning: #ca8a04;
+            --danger: #dc2626;
+            --dark: #1e293b;
+            --light: #f8fafc;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+
+        body {
+            background: var(--light);
+            color: var(--dark);
+            padding: 15px;
+            padding-bottom: 80px;
+        }
+
+        h2 {
+            font-size: 1.2rem;
+            margin: 15px 0 8px 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            margin-bottom: 15px;
+        }
+
+        input[type="file"] {
+            width: 100%;
+            padding: 10px;
+            border: 2px dashed #cbd5e1;
+            border-radius: 6px;
+            background: #fff;
+            cursor: pointer;
+        }
+
+        #reader {
+            width: 100%;
+            border-radius: 8px;
+            overflow: hidden;
+            border: none !important;
+            background: black;
+            min-height: 80px;
+        }
+
+        #statusScanner {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 6px;
+            background: #eff6ff;
+            color: #1d4ed8;
+            font-size: 0.9rem;
+            text-align: center;
+        }
+
+        .produto-item {
+            padding: 12px;
+            border-radius: 6px;
+            background: #fff;
+            margin-bottom: 8px;
+            border-left: 5px solid #cbd5e1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .prod-info {
+            flex: 1;
+            padding-right: 10px;
+        }
+
+        .prod-nome {
+            font-weight: bold;
+            font-size: 0.95rem;
+            margin-bottom: 2px;
+        }
+
+        .prod-sub {
+            font-size: 0.8rem;
+            color: #64748b;
+        }
+
+        .prod-qtd {
+            font-size: 1.1rem;
+            font-weight: bold;
+            padding: 4px 10px;
+            border-radius: 20px;
+            background: #f1f5f9;
+            min-width: 65px;
+            text-align: center;
+        }
+
+        .status-andamento {
+            border-left-color: var(--warning);
+            background: #fef9c3;
+        }
+
+        .status-andamento .prod-qtd {
+            background: var(--warning);
+            color: white;
+        }
+
+        .status-concluido {
+            border-left-color: var(--success);
+            background: #dcfce7;
+        }
+
+        .status-concluido .prod-qtd {
+            background: var(--success);
+            color: white;
+        }
+
+        #bloqueio-tela {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(220, 38, 38, 0.95);
+            z-index: 9999;
+            color: white;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            text-align: center;
+        }
+
+        #bloqueio-tela h1 {
+            font-size: 2rem;
+            margin-bottom: 15px;
+        }
+
+        #bloqueio-tela p {
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+            max-width: 400px;
+        }
+
+        #bloqueio-tela button {
+            background: white;
+            color: var(--danger);
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            cursor: pointer;
+            width: 100%;
+            max-width: 300px;
+        }
+
+        .botoes-acao {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            padding: 12px;
+            background: white;
+            box-shadow: 0 -4px 10px rgba(0,0,0,0.05);
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 1rem;
+            color: white;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        .btn-success { background: var(--success); }
+        .btn-danger { background: var(--danger); }
+    </style>
+</head>
+
+<body>
+
+    <div class="card">
+        <h2>📂 1. Importar XML da NF-e</h2>
+        <input type="file" id="xmlInput" accept=".xml,text/xml">
+    </div>
+
+    <div class="card" id="scannerCard" style="display:none;">
+        <h2>📷 2. Scanner Ativo</h2>
+        <div id="reader"></div>
+        <div id="statusScanner">Preparando câmera...</div>
+    </div>
+
+    <h2>📦 Itens da Nota Fiscal</h2>
+
+    <div id="listaProdutos">
+        <p style="color: #64748b; font-style: italic; text-align: center; padding: 20px;">
+            Nenhum XML carregado ainda.
+        </p>
+    </div>
+
+    <div id="bloqueio-tela">
+        <h1>⚠️ PRODUTO NÃO ENCONTRADO</h1>
+        <p>
+            O código de barras escaneado
+            <br>
+            <strong id="ean-invalido" style="font-size: 1.4rem; background: rgba(0,0,0,0.2); padding: 2px 8px; border-radius: 4px; display:inline-block; margin-top:8px;">00000000</strong>
+            <br>
+            <strong>NÃO CONSTA</strong> nesta Nota Fiscal!
+        </p>
+        <button onclick="liberarTela()">Liberar e Continuar</button>
+    </div>
+
+    <div class="botoes-acao">
+        <button class="btn btn-danger" onclick="limparConferencia()">Limpar Tudo</button>
+        <button class="btn btn-success" onclick="exportarRelatorio()">Exportar CSV</button>
+    </div>
+
+    <script>
+        let produtosNFe = {};
+        let html5QrcodeScanner = null;
+        let scannerBloqueado = false;
+        let iniciandoScanner = false;
+
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        function emitirSom(tipo) {
+            try {
+                if (audioCtx.state === "suspended") {
+                    audioCtx.resume();
+                }
+
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                if (tipo === 'sucesso') {
+                    osc.frequency.setValueAtTime(880, audioCtx.currentTime);
+                    gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.1);
+                } else if (tipo === 'erro') {
+                    osc.frequency.setValueAtTime(150, audioCtx.currentTime);
+                    gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.5);
+                }
+            } catch (erro) {
+                console.warn("Áudio indisponível:", erro);
+            }
+        }
+
+        window.addEventListener('load', () => {
+            if (localStorage.getItem('produtosNFe')) {
+                try {
+                    produtosNFe = JSON.parse(localStorage.getItem('produtosNFe'));
+                    renderizarLista();
+
+                    document.getElementById('scannerCard').style.display = 'block';
+                    iniciarScanner();
+                } catch (erro) {
+                    console.error("Erro ao recuperar conferência:", erro);
+                    localStorage.removeItem('produtosNFe');
+                }
+            }
+        });
+
+        document.getElementById('xmlInput').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+
+            reader.onload = function() {
+                try {
+                    const parser = new DOMParser();
+                    const xmlDoc = parser.parseFromString(reader.result, "text/xml");
+                    const itens = xmlDoc.getElementsByTagName("det");
+
+                    if (itens.length === 0) {
+                        alert("Arquivo inválido ou nenhuma tag <det> encontrada.");
+                        return;
+                    }
+
+                    produtosNFe = {};
+
+                    for (let i = 0; i < itens.length; i++) {
+                        let eanNode = itens[i].getElementsByTagName("cEAN")[0];
+                        let nomeNode = itens[i].getElementsByTagName("xProd")[0];
+                        let qtdNode = itens[i].getElementsByTagName("qCom")[0];
+
+                        let ean = eanNode ? eanNode.textContent.trim() : "";
+                        let nome = nomeNode ? nomeNode.textContent.trim() : "Produto sem nome";
+                        let qtd = qtdNode ? parseFloat(qtdNode.textContent.trim()) : 0;
+
+                        if (ean && ean !== "SEM GTIN") {
+                            produtosNFe[ean] = {
+                                nome: nome,
+                                esperado: qtd,
+                                conferido: 0
+                            };
+                        }
+                    }
+
+                    if (Object.keys(produtosNFe).length === 0) {
+                        alert("Nenhum produto com EAN válido foi encontrado no XML.");
+                        return;
+                    }
+
+                    salvarNoLocalStorage();
+                    renderizarLista();
+
+                    document.getElementById('scannerCard').style.display = 'block';
+                    iniciarScanner();
+
+                } catch (erro) {
+                    console.error(erro);
+                    alert("Não foi possível ler o XML.");
+                }
+            };
+
+            reader.readAsText(file);
+        });
+
+        function renderizarLista() {
+            const container = document.getElementById('listaProdutos');
+            container.innerHTML = "";
+
+            if (Object.keys(produtosNFe).length === 0) {
+                container.innerHTML =
+                    `<p style="color: #64748b; font-style: italic; text-align: center; padding: 20px;">
+                        Nenhum produto encontrado no XML.
+                    </p>`;
+                return;
+            }
+
+            for (let ean in produtosNFe) {
+                const prod = produtosNFe[ean];
+                let classeStatus = "";
+
+                if (prod.conferido > 0 && prod.conferido < prod.esperado) {
+                    classeStatus = "status-andamento";
+                }
+
+                if (prod.conferido === prod.esperado) {
+                    classeStatus = "status-concluido";
+                }
+
+                container.innerHTML += `
+                    <div class="produto-item ${classeStatus}" id="item-${ean}">
+                        <div class="prod-info">
+                            <div class="prod-nome">${escapeHtml(prod.nome)}</div>
+                            <div class="prod-sub">EAN: ${ean}</div>
+                        </div>
+                        <div class="prod-qtd" id="cont-${ean}">
+                            ${prod.conferido}/${prod.esperado}
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        function escapeHtml(texto) {
+            const div = document.createElement("div");
+            div.textContent = texto;
+            return div.innerHTML;
+        }
+
+        async function iniciarScanner() {
+            if (html5QrcodeScanner || iniciandoScanner) return;
+
+            iniciandoScanner = true;
+
+            const status = document.getElementById("statusScanner");
+
+            try {
+                if (typeof Html5QrcodeScanner === "undefined") {
+                    throw new Error(
+                        "A biblioteca do leitor não foi carregada. Verifique a conexão com a internet."
+                    );
+                }
+
+                if (!window.isSecureContext && location.hostname !== "localhost") {
+                    throw new Error(
+                        "A câmera do celular exige uma página HTTPS. Abra este sistema por um endereço que comece com https://."
+                    );
+                }
+
+                status.innerText = "Solicitando acesso à câmera...";
+
+                html5QrcodeScanner = new Html5QrcodeScanner(
+                    "reader",
+                    {
+                        fps: 10,
+                        qrbox: function(viewfinderWidth, viewfinderHeight) {
+                            const largura = Math.min(viewfinderWidth * 0.85, 320);
+                            const altura = Math.min(viewfinderHeight * 0.45, 160);
+                            return {
+                                width: Math.floor(largura),
+                                height: Math.floor(altura)
+                            };
+                        },
+                        aspectRatio: 1.0,
+                        rememberLastUsedCamera: true,
+                        showTorchButtonIfSupported: true,
+                        showZoomSliderIfSupported: true
+                    },
+                    false
+                );
+
+                html5QrcodeScanner.render(
+                    onScanSuccess,
+                    onScanFailure
+                );
+
+                status.innerText = "Aponte a câmera para o código de barras.";
+
+            } catch (erro) {
+                console.error("Erro ao iniciar câmera:", erro);
+
+                if (html5QrcodeScanner) {
+                    try {
+                        await html5QrcodeScanner.clear();
+                    } catch (_) {}
+                    html5QrcodeScanner = null;
+                }
+
+                status.innerText = "Não foi possível iniciar a câmera.";
+
+                alert(
+                    "Não foi possível abrir a câmera.\n\n" +
+                    erro.message +
+                    "\n\n" +
+                    "Verifique também se o navegador tem permissão para usar a câmera."
+                );
+
+            } finally {
+                iniciandoScanner = false;
+            }
+        }
+
+        function onScanFailure(error) {
+            // O leitor chama esta função continuamente enquanto procura um código.
+            // Não exibimos mensagens para cada tentativa para não incomodar o usuário.
+        }
+
+        function onScanSuccess(decodedText) {
+            if (scannerBloqueado) return;
+
+            let eanLimpo = String(decodedText).trim();
+
+            if (!eanLimpo) return;
+
+            if (!produtosNFe[eanLimpo]) {
+                scannerBloqueado = true;
+
+                emitirSom('erro');
+
+                if (navigator.vibrate) {
+                    navigator.vibrate([200, 100, 200]);
+                }
+
+                document.getElementById('ean-invalido').innerText = eanLimpo;
+                document.getElementById('bloqueio-tela').style.display = 'flex';
+                return;
+            }
+
+            let produto = produtosNFe[eanLimpo];
+
+            if (produto.conferido >= produto.esperado) {
+                emitirSom('erro');
+
+                alert(
+                    `⚠️ Limite estourado!\n${produto.nome}\n` +
+                    `Já foram conferidas as ${produto.esperado} unidades.`
+                );
+
+                return;
+            }
+
+            produto.conferido++;
+
+            emitirSom('sucesso');
+
+            if (navigator.vibrate) {
+                navigator.vibrate(80);
+            }
+
+            salvarNoLocalStorage();
+            renderizarLista();
+
+            const item = document.getElementById(`item-${eanLimpo}`);
+
+            if (item) {
+                item.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'center'
+                });
+            }
+        }
+
+        function liberarTela() {
+            document.getElementById('bloqueio-tela').style.display = 'none';
+
+            setTimeout(() => {
+                scannerBloqueado = false;
+            }, 500);
+        }
+
+        function salvarNoLocalStorage() {
+            localStorage.setItem('produtosNFe', JSON.stringify(produtosNFe));
+        }
+
+        async function limparConferencia() {
+            if (confirm("Tem certeza que deseja apagar a conferência atual?")) {
+                localStorage.removeItem('produtosNFe');
+                produtosNFe = {};
+                renderizarLista();
+
+                document.getElementById('scannerCard').style.display = 'none';
+
+                if (html5QrcodeScanner) {
+                    try {
+                        await html5QrcodeScanner.clear();
+                    } catch (erro) {
+                        console.warn("Erro ao fechar scanner:", erro);
+                    }
+
+                    html5QrcodeScanner = null;
+                }
+
+                document.getElementById('xmlInput').value = "";
+            }
+        }
+
+        function exportarRelatorio() {
+            if (Object.keys(produtosNFe).length === 0) {
+                alert("Não há dados para exportar.");
+                return;
+            }
+
+            let csvContent = "\uFEFF";
+            csvContent += "Codigo EAN;Produto;Qtd XML;Qtd Conferida;Status\n";
+
+            for (let ean in produtosNFe) {
+                let p = produtosNFe[ean];
+
+                let status =
+                    p.conferido === p.esperado
+                        ? "OK"
+                        : (p.conferido < p.esperado ? "FALTA" : "SOBRA");
+
+                csvContent +=
+                    `"${ean}";"${String(p.nome).replace(/"/g, '""')}";` +
+                    `${p.esperado};${p.conferido};"${status}"\n`;
+            }
+
+            const blob = new Blob(
+                [csvContent],
+                { type: 'text/csv;charset=utf-8;' }
+            );
+
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+
+            link.setAttribute("href", url);
+            link.setAttribute(
+                "download",
+                `Conferencia_${new Date().toISOString().slice(0,10)}.csv`
+            );
+
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            URL.revokeObjectURL(url);
+        }
+    </script>
+</body>
+</html>
