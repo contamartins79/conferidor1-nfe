@@ -1,609 +1,462 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Conferidor de NF-e Portátil</title>
-
-    <!-- Biblioteca correta do leitor de código de barras -->
-    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
-
-    <style>
-        :root {
-            --primary: #2563eb;
-            --success: #16a34a;
-            --warning: #ca8a04;
-            --danger: #dc2626;
-            --dark: #1e293b;
-            --light: #f8fafc;
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-        }
-
-        body {
-            background: var(--light);
-            color: var(--dark);
-            padding: 15px;
-            padding-bottom: 80px;
-        }
-
-        h2 {
-            font-size: 1.2rem;
-            margin: 15px 0 8px 0;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .card {
-            background: white;
-            padding: 15px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-            margin-bottom: 15px;
-        }
-
-        input[type="file"] {
-            width: 100%;
-            padding: 10px;
-            border: 2px dashed #cbd5e1;
-            border-radius: 6px;
-            background: #fff;
-            cursor: pointer;
-        }
-
-        #reader {
-            width: 100%;
-            border-radius: 8px;
-            overflow: hidden;
-            border: none !important;
-            background: black;
-            min-height: 80px;
-        }
-
-        #statusScanner {
-            margin-top: 10px;
-            padding: 10px;
-            border-radius: 6px;
-            background: #eff6ff;
-            color: #1d4ed8;
-            font-size: 0.9rem;
-            text-align: center;
-        }
-
-        .produto-item {
-            padding: 12px;
-            border-radius: 6px;
-            background: #fff;
-            margin-bottom: 8px;
-            border-left: 5px solid #cbd5e1;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-        }
-
-        .prod-info {
-            flex: 1;
-            padding-right: 10px;
-        }
-
-        .prod-nome {
-            font-weight: bold;
-            font-size: 0.95rem;
-            margin-bottom: 2px;
-        }
-
-        .prod-sub {
-            font-size: 0.8rem;
-            color: #64748b;
-        }
-
-        .prod-qtd {
-            font-size: 1.1rem;
-            font-weight: bold;
-            padding: 4px 10px;
-            border-radius: 20px;
-            background: #f1f5f9;
-            min-width: 65px;
-            text-align: center;
-        }
-
-        .status-andamento {
-            border-left-color: var(--warning);
-            background: #fef9c3;
-        }
-
-        .status-andamento .prod-qtd {
-            background: var(--warning);
-            color: white;
-        }
-
-        .status-concluido {
-            border-left-color: var(--success);
-            background: #dcfce7;
-        }
-
-        .status-concluido .prod-qtd {
-            background: var(--success);
-            color: white;
-        }
-
-        #bloqueio-tela {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background: rgba(220, 38, 38, 0.95);
-            z-index: 9999;
-            color: white;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-            text-align: center;
-        }
-
-        #bloqueio-tela h1 {
-            font-size: 2rem;
-            margin-bottom: 15px;
-        }
-
-        #bloqueio-tela p {
-            font-size: 1.2rem;
-            margin-bottom: 30px;
-            max-width: 400px;
-        }
-
-        #bloqueio-tela button {
-            background: white;
-            color: var(--danger);
-            border: none;
-            padding: 15px 30px;
-            font-size: 1.1rem;
-            font-weight: bold;
-            border-radius: 8px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-            cursor: pointer;
-            width: 100%;
-            max-width: 300px;
-        }
-
-        .botoes-acao {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            padding: 12px;
-            background: white;
-            box-shadow: 0 -4px 10px rgba(0,0,0,0.05);
-            display: flex;
-            gap: 10px;
-        }
-
-        .btn {
-            flex: 1;
-            padding: 12px;
-            border: none;
-            border-radius: 6px;
-            font-weight: bold;
-            font-size: 1rem;
-            color: white;
-            cursor: pointer;
-            text-align: center;
-        }
-
-        .btn-success { background: var(--success); }
-        .btn-danger { background: var(--danger); }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Conferidor de NF-e Portátil</title>
+<!-- Versão fixa da biblioteca. Para uso offline, baixe este arquivo e hospede junto do index.html. -->
+<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+<style>
+:root{--primary:#2563eb;--success:#16a34a;--warning:#ca8a04;--danger:#dc2626;--dark:#1e293b;--light:#f8fafc}
+*{box-sizing:border-box;margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
+body{background:var(--light);color:var(--dark);padding:15px;padding-bottom:80px}
+h2{font-size:1.2rem;margin:15px 0 8px;display:flex;align-items:center;gap:8px}
+.card{background:#fff;padding:15px;border-radius:8px;box-shadow:0 2px 4px rgba(0,0,0,.05);margin-bottom:15px}
+input[type=file]{width:100%;padding:10px;border:2px dashed #cbd5e1;border-radius:6px;background:#fff;cursor:pointer}
+#reader{width:100%;border-radius:8px;overflow:hidden;border:none!important;background:#000;min-height:80px}
+#statusScanner{margin-top:10px;padding:10px;border-radius:6px;background:#eff6ff;color:#1d4ed8;font-size:.9rem;text-align:center}
+#scannerCard{position:sticky;top:0;z-index:50;padding:8px;box-shadow:0 4px 12px rgba(0,0,0,.15)}
+#scannerCard h2{margin:0 0 6px;font-size:1rem}
+#abas{display:flex;gap:6px;overflow-x:auto;margin-top:8px;padding-bottom:2px}
+.aba{flex:0 0 auto;padding:7px 12px;border-radius:20px;border:2px solid #cbd5e1;background:#fff;font-size:.85rem;font-weight:bold;color:var(--dark);cursor:pointer;white-space:nowrap}
+.aba.ativa{border-color:var(--primary);background:var(--primary);color:#fff}
+.aba.ok{border-color:var(--success)}
+.aba.ativa.ok{background:var(--success)}
+#notaInfo{font-size:.9rem;word-break:break-all}
+#resumo{font-size:.95rem}
+.barra{height:8px;background:#e2e8f0;border-radius:4px;margin:8px 0;overflow:hidden}
+.barra i{display:block;height:100%;background:var(--success)}
+.filtro{display:flex;align-items:center;gap:8px;font-size:.85rem;margin-bottom:8px;color:#475569}
+.produto-item{padding:12px;border-radius:6px;background:#fff;margin-bottom:8px;border-left:5px solid #cbd5e1;display:flex;justify-content:space-between;align-items:center;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.oculto{display:none}
+.prod-info{flex:1;padding-right:10px}
+.prod-nome{font-weight:bold;font-size:.95rem;margin-bottom:2px}
+.prod-sub{font-size:.8rem;color:#64748b}
+.prod-sub b{color:var(--warning)}
+.ctrl{display:flex;align-items:center;gap:6px}
+.prod-qtd{font-size:1.1rem;font-weight:bold;padding:4px 10px;border-radius:20px;background:#f1f5f9;min-width:65px;text-align:center;cursor:pointer}
+.mini{width:32px;height:32px;border:none;border-radius:50%;background:#e2e8f0;font-size:1.2rem;font-weight:bold;color:var(--dark);cursor:pointer}
+.status-andamento{border-left-color:var(--warning);background:#fef9c3}
+.status-andamento .prod-qtd{background:var(--warning);color:#fff}
+.status-concluido{border-left-color:var(--success);background:#dcfce7}
+.status-concluido .prod-qtd{background:var(--success);color:#fff}
+.status-sobra{border-left-color:var(--danger);background:#fee2e2}
+.status-vazio{color:#64748b;font-style:italic;text-align:center;padding:20px}
+.status-sobra .prod-qtd{background:var(--danger);color:#fff}
+#bloqueio-tela{display:none;position:fixed;inset:0;background:rgba(220,38,38,.95);z-index:9999;color:#fff;flex-direction:column;justify-content:center;align-items:center;padding:20px;text-align:center}
+#bloqueio-tela h1{font-size:2rem;margin-bottom:15px}
+#bloqueio-tela p{font-size:1.2rem;margin-bottom:30px;max-width:400px}
+#bloqueio-tela .ean{font-size:1.4rem;background:rgba(0,0,0,.2);padding:2px 8px;border-radius:4px;display:inline-block;margin:8px 0}
+#bloqueio-tela button{background:#fff;color:var(--danger);border:none;padding:15px 30px;font-size:1.1rem;font-weight:bold;border-radius:8px;box-shadow:0 4px 10px rgba(0,0,0,.2);cursor:pointer;width:100%;max-width:300px}
+.botoes-acao{position:fixed;bottom:0;left:0;width:100%;padding:12px;background:#fff;box-shadow:0 -4px 10px rgba(0,0,0,.05);display:flex;gap:10px}
+.btn{flex:1;padding:12px;border:none;border-radius:6px;font-weight:bold;font-size:1rem;color:#fff;cursor:pointer;text-align:center}
+.btn-success{background:var(--success)}.btn-danger{background:var(--danger)}
+</style>
 </head>
-
 <body>
 
-    <div class="card">
-        <h2>📂 1. Importar XML da NF-e</h2>
-        <input type="file" id="xmlInput" accept=".xml,text/xml">
-    </div>
-
-    <div class="card" id="scannerCard" style="display:none;">
-        <h2>📷 2. Scanner Ativo</h2>
-        <div id="reader"></div>
-        <div id="statusScanner">Preparando câmera...</div>
-    </div>
-
-    <h2>📦 Itens da Nota Fiscal</h2>
-
-    <div id="listaProdutos">
-        <p style="color: #64748b; font-style: italic; text-align: center; padding: 20px;">
-            Nenhum XML carregado ainda.
-        </p>
-    </div>
-
-    <div id="bloqueio-tela">
-        <h1>⚠️ PRODUTO NÃO ENCONTRADO</h1>
-        <p>
-            O código de barras escaneado
-            <br>
-            <strong id="ean-invalido" style="font-size: 1.4rem; background: rgba(0,0,0,0.2); padding: 2px 8px; border-radius: 4px; display:inline-block; margin-top:8px;">00000000</strong>
-            <br>
-            <strong>NÃO CONSTA</strong> nesta Nota Fiscal!
-        </p>
-        <button onclick="liberarTela()">Liberar e Continuar</button>
-    </div>
-
-    <div class="botoes-acao">
-        <button class="btn btn-danger" onclick="limparConferencia()">Limpar Tudo</button>
-        <button class="btn btn-success" onclick="exportarRelatorio()">Exportar CSV</button>
-    </div>
-
-    <script>
-        let produtosNFe = {};
-        let html5QrcodeScanner = null;
-        let scannerBloqueado = false;
-        let iniciandoScanner = false;
-
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-
-        function emitirSom(tipo) {
-            try {
-                if (audioCtx.state === "suspended") {
-                    audioCtx.resume();
-                }
-
-                const osc = audioCtx.createOscillator();
-                const gain = audioCtx.createGain();
-
-                osc.connect(gain);
-                gain.connect(audioCtx.destination);
-
-                if (tipo === 'sucesso') {
-                    osc.frequency.setValueAtTime(880, audioCtx.currentTime);
-                    gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
-                    osc.start();
-                    osc.stop(audioCtx.currentTime + 0.1);
-                } else if (tipo === 'erro') {
-                    osc.frequency.setValueAtTime(150, audioCtx.currentTime);
-                    gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
-                    osc.start();
-                    osc.stop(audioCtx.currentTime + 0.5);
-                }
-            } catch (erro) {
-                console.warn("Áudio indisponível:", erro);
-            }
-        }
-
-        window.addEventListener('load', () => {
-            if (localStorage.getItem('produtosNFe')) {
-                try {
-                    produtosNFe = JSON.parse(localStorage.getItem('produtosNFe'));
-                    renderizarLista();
-
-                    document.getElementById('scannerCard').style.display = 'block';
-                    iniciarScanner();
-                } catch (erro) {
-                    console.error("Erro ao recuperar conferência:", erro);
-                    localStorage.removeItem('produtosNFe');
-                }
-            }
-        });
-
-        document.getElementById('xmlInput').addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (!file) return;
-
-            const reader = new FileReader();
-
-            reader.onload = function() {
-                try {
-                    const parser = new DOMParser();
-                    const xmlDoc = parser.parseFromString(reader.result, "text/xml");
-                    const itens = xmlDoc.getElementsByTagName("det");
-
-                    if (itens.length === 0) {
-                        alert("Arquivo inválido ou nenhuma tag <det> encontrada.");
-                        return;
-                    }
-
-                    produtosNFe = {};
-
-                    for (let i = 0; i < itens.length; i++) {
-                        let eanNode = itens[i].getElementsByTagName("cEAN")[0];
-                        let nomeNode = itens[i].getElementsByTagName("xProd")[0];
-                        let qtdNode = itens[i].getElementsByTagName("qCom")[0];
-
-                        let ean = eanNode ? eanNode.textContent.trim() : "";
-                        let nome = nomeNode ? nomeNode.textContent.trim() : "Produto sem nome";
-                        let qtd = qtdNode ? parseFloat(qtdNode.textContent.trim()) : 0;
-
-                        if (ean && ean !== "SEM GTIN") {
-                            produtosNFe[ean] = {
-                                nome: nome,
-                                esperado: qtd,
-                                conferido: 0
-                            };
-                        }
-                    }
-
-                    if (Object.keys(produtosNFe).length === 0) {
-                        alert("Nenhum produto com EAN válido foi encontrado no XML.");
-                        return;
-                    }
-
-                    salvarNoLocalStorage();
-                    renderizarLista();
-
-                    document.getElementById('scannerCard').style.display = 'block';
-                    iniciarScanner();
-
-                } catch (erro) {
-                    console.error(erro);
-                    alert("Não foi possível ler o XML.");
-                }
-            };
-
-            reader.readAsText(file);
-        });
-
-        function renderizarLista() {
-            const container = document.getElementById('listaProdutos');
-            container.innerHTML = "";
-
-            if (Object.keys(produtosNFe).length === 0) {
-                container.innerHTML =
-                    `<p style="color: #64748b; font-style: italic; text-align: center; padding: 20px;">
-                        Nenhum produto encontrado no XML.
-                    </p>`;
-                return;
-            }
-
-            for (let ean in produtosNFe) {
-                const prod = produtosNFe[ean];
-                let classeStatus = "";
-
-                if (prod.conferido > 0 && prod.conferido < prod.esperado) {
-                    classeStatus = "status-andamento";
-                }
-
-                if (prod.conferido === prod.esperado) {
-                    classeStatus = "status-concluido";
-                }
-
-                container.innerHTML += `
-                    <div class="produto-item ${classeStatus}" id="item-${ean}">
-                        <div class="prod-info">
-                            <div class="prod-nome">${escapeHtml(prod.nome)}</div>
-                            <div class="prod-sub">EAN: ${ean}</div>
-                        </div>
-                        <div class="prod-qtd" id="cont-${ean}">
-                            ${prod.conferido}/${prod.esperado}
-                        </div>
-                    </div>
-                `;
-            }
-        }
-
-        function escapeHtml(texto) {
-            const div = document.createElement("div");
-            div.textContent = texto;
-            return div.innerHTML;
-        }
-
-        async function iniciarScanner() {
-            if (html5QrcodeScanner || iniciandoScanner) return;
-
-            iniciandoScanner = true;
-
-            const status = document.getElementById("statusScanner");
-
-            try {
-                if (typeof Html5QrcodeScanner === "undefined") {
-                    throw new Error(
-                        "A biblioteca do leitor não foi carregada. Verifique a conexão com a internet."
-                    );
-                }
-
-                if (!window.isSecureContext && location.hostname !== "localhost") {
-                    throw new Error(
-                        "A câmera do celular exige uma página HTTPS. Abra este sistema por um endereço que comece com https://."
-                    );
-                }
-
-                status.innerText = "Solicitando acesso à câmera...";
-
-                html5QrcodeScanner = new Html5QrcodeScanner(
-                    "reader",
-                    {
-                        fps: 10,
-                        qrbox: function(viewfinderWidth, viewfinderHeight) {
-                            const largura = Math.min(viewfinderWidth * 0.85, 320);
-                            const altura = Math.min(viewfinderHeight * 0.45, 160);
-                            return {
-                                width: Math.floor(largura),
-                                height: Math.floor(altura)
-                            };
-                        },
-                        aspectRatio: 1.0,
-                        rememberLastUsedCamera: true,
-                        showTorchButtonIfSupported: true,
-                        showZoomSliderIfSupported: true
-                    },
-                    false
-                );
-
-                html5QrcodeScanner.render(
-                    onScanSuccess,
-                    onScanFailure
-                );
-
-                status.innerText = "Aponte a câmera para o código de barras.";
-
-            } catch (erro) {
-                console.error("Erro ao iniciar câmera:", erro);
-
-                if (html5QrcodeScanner) {
-                    try {
-                        await html5QrcodeScanner.clear();
-                    } catch (_) {}
-                    html5QrcodeScanner = null;
-                }
-
-                status.innerText = "Não foi possível iniciar a câmera.";
-
-                alert(
-                    "Não foi possível abrir a câmera.\n\n" +
-                    erro.message +
-                    "\n\n" +
-                    "Verifique também se o navegador tem permissão para usar a câmera."
-                );
-
-            } finally {
-                iniciandoScanner = false;
-            }
-        }
-
-        function onScanFailure(error) {
-            // O leitor chama esta função continuamente enquanto procura um código.
-            // Não exibimos mensagens para cada tentativa para não incomodar o usuário.
-        }
-
-        function onScanSuccess(decodedText) {
-            if (scannerBloqueado) return;
-
-            let eanLimpo = String(decodedText).trim();
-
-            if (!eanLimpo) return;
-
-            if (!produtosNFe[eanLimpo]) {
-                scannerBloqueado = true;
-
-                emitirSom('erro');
-
-                if (navigator.vibrate) {
-                    navigator.vibrate([200, 100, 200]);
-                }
-
-                document.getElementById('ean-invalido').innerText = eanLimpo;
-                document.getElementById('bloqueio-tela').style.display = 'flex';
-                return;
-            }
-
-            let produto = produtosNFe[eanLimpo];
-
-            if (produto.conferido >= produto.esperado) {
-                emitirSom('erro');
-
-                alert(
-                    `⚠️ Limite estourado!\n${produto.nome}\n` +
-                    `Já foram conferidas as ${produto.esperado} unidades.`
-                );
-
-                return;
-            }
-
-            produto.conferido++;
-
-            emitirSom('sucesso');
-
-            if (navigator.vibrate) {
-                navigator.vibrate(80);
-            }
-
-            salvarNoLocalStorage();
-            renderizarLista();
-
-            const item = document.getElementById(`item-${eanLimpo}`);
-
-            if (item) {
-                item.scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'center'
-                });
-            }
-        }
-
-        function liberarTela() {
-            document.getElementById('bloqueio-tela').style.display = 'none';
-
-            setTimeout(() => {
-                scannerBloqueado = false;
-            }, 500);
-        }
-
-        function salvarNoLocalStorage() {
-            localStorage.setItem('produtosNFe', JSON.stringify(produtosNFe));
-        }
-
-        async function limparConferencia() {
-            if (confirm("Tem certeza que deseja apagar a conferência atual?")) {
-                localStorage.removeItem('produtosNFe');
-                produtosNFe = {};
-                renderizarLista();
-
-                document.getElementById('scannerCard').style.display = 'none';
-
-                if (html5QrcodeScanner) {
-                    try {
-                        await html5QrcodeScanner.clear();
-                    } catch (erro) {
-                        console.warn("Erro ao fechar scanner:", erro);
-                    }
-
-                    html5QrcodeScanner = null;
-                }
-
-                document.getElementById('xmlInput').value = "";
-            }
-        }
-
-        function exportarRelatorio() {
-            if (Object.keys(produtosNFe).length === 0) {
-                alert("Não há dados para exportar.");
-                return;
-            }
-
-            let csvContent = "\uFEFF";
-            csvContent += "Codigo EAN;Produto;Qtd XML;Qtd Conferida;Status\n";
-
-            for (let ean in produtosNFe) {
-                let p = produtosNFe[ean];
-
-                let status =
-                    p.conferido === p.esperado
-                        ? "OK"
-                        : (p.conferido < p.esperado ? "FALTA" : "SOBRA");
-
-                csvContent +=
-                    `"${ean}";"${String(p.nome).replace(/"/g, '""')}";` +
-                    `${p.esperado};${p.conferido};"${status}"\n`;
-            }
-
-            const blob = new Blob(
-                [csvContent],
-                { type: 'text/csv;charset=utf-8;' }
-            );
-
-            const url = URL.createObjectURL(blob);
-            const link = document.createElement("a");
-
-            link.setAttribute("href", url);
-            link.setAttribute(
-                "download",
-                `Conferencia_${new Date().toISOString().slice(0,10)}.csv`
-            );
-
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-
-            URL.revokeObjectURL(url);
-        }
-    </script>
+<div class="card">
+  <h2>📂 1. Importar XML(s) da NF-e</h2>
+  <input type="file" id="xmlInput" accept=".xml,text/xml" multiple>
+</div>
+
+<div class="card" id="scannerCard" style="display:none">
+  <h2>📷 2. Scanner Ativo</h2>
+  <div id="reader"></div>
+  <div id="statusScanner">Preparando câmera...</div>
+  <div id="abas"></div>
+</div>
+
+<div class="card" id="notaInfo" style="display:none"></div>
+<div class="card" id="resumo" style="display:none"></div>
+
+<h2>📦 Itens da Nota Fiscal</h2>
+<label class="filtro"><input type="checkbox" id="soPend"> Mostrar só pendentes</label>
+<div id="listaProdutos"><p class="status-vazio">Nenhum XML carregado ainda.</p></div>
+
+<div id="bloqueio-tela">
+  <h1 id="blq-titulo"></h1>
+  <p id="blq-msg"></p>
+  <button onclick="liberarTela()">Liberar e Continuar</button>
+</div>
+
+<div class="botoes-acao">
+  <button class="btn btn-danger" onclick="limparConferencia()">Limpar Tudo</button>
+  <button class="btn btn-success" onclick="exportarRelatorio()">Exportar CSV</button>
+</div>
+
+<script>
+const KEY = 'conferenciaNFeLote';
+const EPS = 1e-6;
+const INTERVALO_REPETICAO = 1200; // ms sem ler o código para aceitar a mesma leitura de novo
+const novaS = () => ({ nota: {}, itens: {}, codigos: {}, ocorr: [] });
+let S = novaS();                 // nota ativa (referência para B.notas[B.ativa])
+let B = { notas: [], ativa: -1 }; // lote de notas
+let scanner = null, iniciando = false, bloqueado = false;
+let ultimo = { cod: '', t: 0 };
+let audioCtx = null;
+
+const $ = id => document.getElementById(id);
+const round = v => Math.round(v * 1000) / 1000;
+const fmt = v => String(round(v)).replace('.', ',');
+const completo = i => i.conferido >= i.esperado - EPS;
+const esc = t => { const d = document.createElement('div'); d.textContent = t; return d.innerHTML; };
+
+/* ---------- Áudio (ativado no primeiro toque do usuário) ---------- */
+function initAudio() {
+  try {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+  } catch (e) {}
+}
+['click', 'touchstart'].forEach(ev => document.addEventListener(ev, initAudio, { passive: true }));
+
+function emitirSom(tipo) {
+  try {
+    initAudio();
+    const osc = audioCtx.createOscillator(), gain = audioCtx.createGain();
+    osc.connect(gain); gain.connect(audioCtx.destination);
+    const ok = tipo === 'sucesso';
+    osc.frequency.setValueAtTime(ok ? 880 : 150, audioCtx.currentTime);
+    gain.gain.setValueAtTime(ok ? 0.1 : 0.3, audioCtx.currentTime);
+    osc.start(); osc.stop(audioCtx.currentTime + (ok ? 0.1 : 0.5));
+  } catch (e) {}
+}
+
+/* ---------- Códigos de barras ---------- */
+// Normaliza qualquer GTIN (8, 12, 13 ou 14 dígitos) para 14 dígitos. "SEM GTIN" e zeros viram null.
+function norm(s) {
+  s = String(s || '').trim();
+  return /^\d{8,14}$/.test(s) && !/^0+$/.test(s) ? s.padStart(14, '0') : null;
+}
+// Valida o dígito verificador (descarta leituras ruins da câmera).
+function gtinOk(c) {
+  let s = 0;
+  for (let i = 0; i < 13; i++) s += (+c[12 - i]) * (i % 2 === 0 ? 3 : 1);
+  return (10 - s % 10) % 10 === +c[13];
+}
+
+/* ---------- Leitura do XML ---------- */
+function tag(el, n) { const x = el && el.getElementsByTagName(n)[0]; return x ? x.textContent.trim() : ''; }
+
+function lerXML(txt) {
+  const doc = new DOMParser().parseFromString(txt, 'text/xml');
+  if (doc.getElementsByTagName('parsererror').length) throw new Error('XML malformado.');
+  const dets = doc.getElementsByTagName('det');
+  if (!dets.length) throw new Error('Arquivo inválido: nenhuma tag <det> encontrada.');
+
+  const inf = doc.getElementsByTagName('infNFe')[0];
+  const nota = {
+    numero: tag(doc, 'nNF'), serie: tag(doc, 'serie'),
+    emit: tag(doc.getElementsByTagName('emit')[0], 'xNome'),
+    chave: ((inf && inf.getAttribute('Id')) || '').replace(/^NFe/, '') || tag(doc, 'chNFe')
+  };
+  const itens = {}, codigos = {};
+
+  for (const d of dets) {
+    const n = d.getAttribute('nItem') || '?';
+    const nome = tag(d, 'xProd') || 'Produto sem nome';
+    const qCom = parseFloat(tag(d, 'qCom')) || 0, qTrib = parseFloat(tag(d, 'qTrib')) || 0;
+    const e1 = norm(tag(d, 'cEAN')), e2 = norm(tag(d, 'cEANTrib'));
+    const passos = {};
+    let key, esperado;
+
+    if (e1 || e2) {
+      key = e1 || e2;
+      if (e1 && e2 && e1 !== e2 && qCom > 0 && qTrib > 0) {
+        // Caixa (cEAN) e unidade (cEANTrib): conta em unidades; a caixa soma várias de uma vez.
+        esperado = qTrib; passos[e1] = qTrib / qCom; passos[e2] = 1;
+      } else {
+        esperado = e1 ? qCom : (qTrib || qCom); passos[key] = 1;
+      }
+    } else {
+      key = 'SG' + n; esperado = qCom; // sem GTIN: conferência manual
+    }
+
+    // Mesmo código em mais de um item da nota: soma as quantidades.
+    const it = itens[key] || (itens[key] = { nome, esperado: 0, conferido: 0, manual: !(e1 || e2), ean: e1 || e2 || '' });
+    it.esperado = round(it.esperado + esperado);
+    for (const c in passos) codigos[c] = { key, passo: passos[c] };
+  }
+  return { nota, itens, codigos };
+}
+
+/* ---------- Lote de notas ---------- */
+function selecionar(i) {
+  B.ativa = i; S = B.notas[i] || novaS();
+  ultimo = { cod: '', t: 0 };
+  salvar(); renderTudo();
+}
+
+function renderAbas() {
+  $('abas').innerHTML = B.notas.map((nt, i) => {
+    const it = Object.values(nt.itens), ok = it.length && it.every(completo);
+    return `<button class="aba${i === B.ativa ? ' ativa' : ''}${ok ? ' ok' : ''}" data-i="${i}">${ok ? '✓ ' : ''}NF ${esc(String(nt.nota.numero || i + 1))} · ${it.filter(completo).length}/${it.length}</button>`;
+  }).join('');
+}
+$('abas').addEventListener('click', e => { const b = e.target.closest('.aba'); if (b) selecionar(+b.dataset.i); });
+
+$('xmlInput').addEventListener('change', async e => {
+  initAudio();
+  const files = [...e.target.files];
+  if (!files.length) return;
+  const msgs = []; let primeira = -1, semGtin = 0;
+  for (const f of files) {
+    try {
+      const buf = await f.arrayBuffer();
+      let txt = new TextDecoder('utf-8').decode(buf);
+      if (/encoding=["']iso-8859-1["']/i.test(txt.slice(0, 200))) txt = new TextDecoder('iso-8859-1').decode(buf);
+      const nt = { ...lerXML(txt), ocorr: [] };
+      if (nt.nota.chave && B.notas.some(x => x.nota.chave === nt.nota.chave)) { msgs.push(f.name + ': esta nota já foi importada.'); continue; }
+      B.notas.push(nt);
+      if (primeira < 0) primeira = B.notas.length - 1;
+      semGtin += Object.values(nt.itens).filter(i => i.manual).length;
+    } catch (err) {
+      console.error(err);
+      msgs.push(f.name + ': ' + (err.message || 'não foi possível ler o XML.'));
+    }
+  }
+  e.target.value = '';
+  if (primeira >= 0) { selecionar(primeira); mostrarScanner(); }
+  if (semGtin) msgs.push(semGtin + ' item(ns) SEM GTIN não podem ser lidos pela câmera.\nConfira-os com os botões + e − na lista.');
+  if (msgs.length) alert(msgs.join('\n'));
+});
+
+/* ---------- Renderização ---------- */
+function itemHTML(k) {
+  const p = S.itens[k];
+  let c = '';
+  if (p.conferido > EPS) c = p.conferido > p.esperado + EPS ? 'status-sobra' : completo(p) ? 'status-concluido' : 'status-andamento';
+  if ($('soPend').checked && completo(p) && c !== 'status-sobra') c += ' oculto';
+  return `<div class="produto-item ${c}" data-k="${esc(k)}">
+    <div class="prod-info"><div class="prod-nome">${esc(p.nome)}</div>
+    <div class="prod-sub">${p.manual ? '<b>SEM GTIN – conferir manualmente</b>' : 'EAN: ' + esc(p.ean)}</div></div>
+    <div class="ctrl"><button class="mini" data-a="-">−</button>
+    <div class="prod-qtd" data-a="e">${fmt(p.conferido)}/${fmt(p.esperado)}</div>
+    <button class="mini" data-a="+">+</button></div></div>`;
+}
+
+function renderLista() {
+  const keys = Object.keys(S.itens);
+  $('listaProdutos').innerHTML = keys.length ? keys.map(itemHTML).join('') : '<p class="status-vazio">Nenhum XML carregado ainda.</p>';
+}
+
+function atualizarItem(k) {
+  const el = [...document.querySelectorAll('.produto-item')].find(e => e.dataset.k === k);
+  if (el) el.outerHTML = itemHTML(k);
+  renderResumo();
+  return [...document.querySelectorAll('.produto-item')].find(e => e.dataset.k === k);
+}
+
+function renderResumo() {
+  renderAbas();
+  const it = Object.values(S.itens);
+  $('notaInfo').style.display = $('resumo').style.display = it.length ? 'block' : 'none';
+  if (!it.length) return;
+  const n = S.nota;
+  $('notaInfo').innerHTML = `<b>NF-e ${esc(n.numero || '-')}${n.serie ? '/' + esc(n.serie) : ''}</b> — ${esc(n.emit || 'emitente não informado')}<br><small>Chave: ${esc(n.chave || '-')}</small><br><button class="btn btn-danger" style="margin-top:8px;padding:6px 10px;font-size:.8rem;flex:none" onclick="removerNota()">Remover esta nota</button>`;
+  let un = 0, tot = 0;
+  it.forEach(i => { un += Math.min(i.conferido, i.esperado); tot += i.esperado; });
+  const pct = tot ? Math.round(un / tot * 100) : 0;
+  const sg = it.filter(i => i.manual).length;
+  $('resumo').innerHTML = `<b>${it.filter(completo).length}/${it.length}</b> itens concluídos · <b>${fmt(un)}/${fmt(tot)}</b> unidades
+    <div class="barra"><i style="width:${pct}%"></i></div>
+    <small>${S.ocorr.length} ocorrência(s)${sg ? ' · ' + sg + ' item(ns) sem GTIN' : ''}</small>`;
+}
+
+function renderTudo() { renderLista(); renderResumo(); }
+$('soPend').addEventListener('change', renderLista);
+
+/* ---------- Ajuste manual (+ / − / digitar quantidade) ---------- */
+$('listaProdutos').addEventListener('click', e => {
+  const b = e.target.closest('[data-a]');
+  const row = e.target.closest('.produto-item');
+  if (!b || !row) return;
+  const k = row.dataset.k, p = S.itens[k];
+  if (!p) return;
+  const a = b.dataset.a;
+  if (a === '+') {
+    if (p.conferido + 1 > p.esperado + EPS) { registrar('EXCEDENTE', p.ean || k, p.nome); bloquear('⚠️ LIMITE ESTOURADO', `${esc(p.nome)}<br>Já foram conferidas as ${fmt(p.esperado)} unidades.`); return; }
+    p.conferido = round(p.conferido + 1);
+  } else if (a === '-') {
+    p.conferido = Math.max(0, round(p.conferido - 1));
+  } else {
+    const v = prompt(`Quantidade conferida de "${p.nome}" (esperado: ${fmt(p.esperado)}):`, fmt(p.conferido));
+    if (v === null) return;
+    const n = parseFloat(v.replace(',', '.'));
+    if (isNaN(n) || n < 0) { alert('Quantidade inválida.'); return; }
+    p.conferido = round(n);
+  }
+  salvar(); atualizarItem(k);
+});
+
+/* ---------- Scanner ---------- */
+function mostrarScanner() { $('scannerCard').style.display = 'block'; iniciarScanner(); }
+
+async function iniciarScanner() {
+  if (scanner || iniciando) return;
+  iniciando = true;
+  const status = $('statusScanner');
+  try {
+    if (typeof Html5QrcodeScanner === 'undefined') throw new Error('A biblioteca do leitor não foi carregada. Verifique a conexão com a internet.');
+    if (!window.isSecureContext && location.hostname !== 'localhost') throw new Error('A câmera do celular exige uma página HTTPS. Abra este sistema por um endereço que comece com https://.');
+    status.innerText = 'Solicitando acesso à câmera...';
+    const F = Html5QrcodeSupportedFormats;
+    scanner = new Html5QrcodeScanner('reader', {
+      fps: 10,
+      qrbox: (w, h) => ({ width: Math.floor(Math.min(w * 0.85, 320)), height: Math.floor(Math.min(h * 0.45, 160)) }),
+      aspectRatio: 1.777778,
+      rememberLastUsedCamera: true,
+      showTorchButtonIfSupported: true,
+      showZoomSliderIfSupported: true,
+      formatsToSupport: [F.EAN_13, F.EAN_8, F.UPC_A, F.UPC_E, F.ITF],
+      experimentalFeatures: { useBarCodeDetectorIfSupported: true }
+    }, false);
+    scanner.render(onScanSuccess, () => {});
+    status.innerText = 'Aponte a câmera para o código de barras.';
+  } catch (erro) {
+    console.error('Erro ao iniciar câmera:', erro);
+    if (scanner) { try { await scanner.clear(); } catch (_) {} scanner = null; }
+    status.innerText = 'Não foi possível iniciar a câmera.';
+    alert('Não foi possível abrir a câmera.\n\n' + erro.message + '\n\nVerifique também se o navegador tem permissão para usar a câmera.');
+  } finally { iniciando = false; }
+}
+
+function bloquear(titulo, html) {
+  bloqueado = true;
+  emitirSom('erro');
+  if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
+  $('blq-titulo').innerText = titulo;
+  $('blq-msg').innerHTML = html;
+  $('bloqueio-tela').style.display = 'flex';
+}
+
+function liberarTela() {
+  $('bloqueio-tela').style.display = 'none';
+  ultimo.t = Date.now(); // evita recontar o mesmo código que ainda está na frente da câmera
+  setTimeout(() => { bloqueado = false; }, 500);
+}
+
+function registrar(tipo, cod, nome) {
+  S.ocorr.push({ t: new Date().toLocaleString('pt-BR'), tipo, cod: String(cod), nome: nome || '' });
+  salvar(); renderResumo();
+}
+
+function onScanSuccess(texto) {
+  if (bloqueado) return;
+  const bruto = String(texto).trim();
+  if (!bruto) return;
+
+  // A câmera repete a leitura a cada frame: o mesmo código só conta de novo depois de sumir da tela.
+  const agora = Date.now();
+  const repetido = bruto === ultimo.cod && agora - ultimo.t < INTERVALO_REPETICAO;
+  ultimo = { cod: bruto, t: agora };
+  if (repetido) return;
+
+  const cod = norm(bruto);
+  if (!cod) return;
+  const ref = S.codigos[cod];
+
+  if (!ref) {
+    if (!gtinOk(cod)) return; // dígito verificador inválido: leitura ruim, ignora
+    registrar('NAO_CONSTA', bruto);
+    const outras = B.notas.filter(x => x !== S && x.codigos[cod]).map(x => 'NF ' + (x.nota.numero || '?'));
+    bloquear('⚠️ PRODUTO NÃO ENCONTRADO', `O código de barras escaneado<br><strong class="ean">${esc(bruto)}</strong><br><strong>NÃO CONSTA</strong> na NF ${esc(S.nota.numero || '')}!` + (outras.length ? `<br><br>Consta em: <strong>${esc(outras.join(', '))}</strong>` : ''));
+    return;
+  }
+
+  const p = S.itens[ref.key];
+  if (p.conferido + ref.passo > p.esperado + EPS) {
+    registrar('EXCEDENTE', bruto, p.nome);
+    bloquear('⚠️ LIMITE ESTOURADO', `${esc(p.nome)}<br>Já foram conferidas as ${fmt(p.esperado)} unidades.`);
+    return;
+  }
+
+  p.conferido = round(p.conferido + ref.passo);
+  emitirSom('sucesso');
+  if (navigator.vibrate) navigator.vibrate(80);
+  salvar();
+  atualizarItem(ref.key);
+  $('statusScanner').innerText = `NF ${S.nota.numero || ''}: ✔ ${p.nome} — ${fmt(p.conferido)}/${fmt(p.esperado)}`;
+}
+
+/* ---------- Armazenamento ---------- */
+function salvar() {
+  try { localStorage.setItem(KEY, JSON.stringify(B)); }
+  catch (e) { console.warn('Não foi possível salvar:', e); }
+}
+
+window.addEventListener('load', () => {
+  try {
+    const salvo = localStorage.getItem(KEY);
+    if (!salvo) return;
+    const b = JSON.parse(salvo);
+    if (Array.isArray(b.notas) && b.notas.length) {
+      B = b;
+      selecionar(Math.min(Math.max(b.ativa, 0), b.notas.length - 1));
+      mostrarScanner();
+    }
+  } catch (e) { console.error('Erro ao recuperar conferência:', e); localStorage.removeItem(KEY); }
+});
+
+async function zerar() {
+  localStorage.removeItem(KEY);
+  B = { notas: [], ativa: -1 }; S = novaS();
+  renderTudo();
+  $('scannerCard').style.display = 'none';
+  if (scanner) { try { await scanner.clear(); } catch (e) { console.warn(e); } scanner = null; }
+  $('xmlInput').value = '';
+}
+
+async function limparConferencia() {
+  if (!confirm('Tem certeza que deseja apagar TODAS as notas e a conferência?\n(Exporte o CSV antes, se precisar do relatório.)')) return;
+  await zerar();
+}
+
+async function removerNota() {
+  if (!confirm(`Remover a NF ${S.nota.numero || ''} e sua conferência?`)) return;
+  B.notas.splice(B.ativa, 1);
+  if (!B.notas.length) { await zerar(); return; }
+  selecionar(Math.min(B.ativa, B.notas.length - 1));
+}
+
+/* ---------- Exportação (todas as notas do lote em um CSV) ---------- */
+function exportarRelatorio() {
+  if (!B.notas.length) { alert('Não há dados para exportar.'); return; }
+  const q = v => { v = String(v); if (/^[=+\-@]/.test(v)) v = "'" + v; return '"' + v.replace(/"/g, '""') + '"'; };
+  const txt = v => '="' + v + '"'; // evita notação científica no Excel
+  const n = v => String(round(v)).replace('.', ',');
+  const stat = p => { const d = round(p.conferido - p.esperado); return Math.abs(d) < EPS ? 'OK' : d < 0 ? 'FALTA' : 'SOBRA'; };
+
+  let c = '\uFEFF';
+  c += `Gerado em;${q(new Date().toLocaleString('pt-BR'))}\nNotas no lote;${B.notas.length}\n\n`;
+  c += 'RESUMO DO LOTE\nNF;Serie;Emitente;Itens;Itens OK;Itens com divergencia;Ocorrencias\n';
+  B.notas.forEach(nt => {
+    const it = Object.values(nt.itens), ok = it.filter(p => stat(p) === 'OK').length;
+    c += `${q(nt.nota.numero || '')};${q(nt.nota.serie || '')};${q(nt.nota.emit || '')};${it.length};${ok};${it.length - ok};${nt.ocorr.length}\n`;
+  });
+
+  B.notas.forEach(nt => {
+    c += `\nNF-e;${q(nt.nota.numero || '')};Serie;${q(nt.nota.serie || '')}\nEmitente;${q(nt.nota.emit || '')}\nChave;${txt(nt.nota.chave || '')}\n`;
+    c += 'Codigo EAN;Produto;Qtd XML;Qtd Conferida;Diferenca;Status;Obs\n';
+    for (const k in nt.itens) {
+      const p = nt.itens[k];
+      c += `${p.manual ? '""' : txt(p.ean)};${q(p.nome)};${n(p.esperado)};${n(p.conferido)};${n(p.conferido - p.esperado)};${stat(p)};${p.manual ? 'SEM GTIN - conferido manualmente' : ''}\n`;
+    }
+    c += 'OCORRENCIAS\nHora;Tipo;Codigo;Produto\n';
+    if (!nt.ocorr.length) c += 'Nenhuma;;;\n';
+    nt.ocorr.forEach(o => {
+      c += `${q(o.t)};${o.tipo === 'NAO_CONSTA' ? 'NAO CONSTA NA NF' : 'TENTATIVA ACIMA DO LIMITE'};${txt(o.cod)};${q(o.nome)}\n`;
+    });
+  });
+
+  const url = URL.createObjectURL(new Blob([c], { type: 'text/csv;charset=utf-8;' }));
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `Conferencia_${B.notas.length > 1 ? 'lote_' + B.notas.length + 'NF' : 'NF' + (B.notas[0].nota.numero || '')}_${new Date().toISOString().slice(0, 10)}.csv`;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+</script>
 </body>
 </html>
