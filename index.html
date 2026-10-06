@@ -13,10 +13,15 @@ body{background:var(--light);color:var(--dark);padding:15px;padding-bottom:80px}
 h2{font-size:1.2rem;margin:15px 0 8px;display:flex;align-items:center;gap:8px}
 .card{background:#fff;padding:15px;border-radius:8px;box-shadow:0 2px 4px rgba(0,0,0,.05);margin-bottom:15px}
 input[type=file]{width:100%;padding:10px;border:2px dashed #cbd5e1;border-radius:6px;background:#fff;cursor:pointer}
-#reader{width:100%;border-radius:8px;overflow:hidden;border:none!important;background:#000;min-height:80px}
-#statusScanner{margin-top:10px;padding:10px;border-radius:6px;background:#eff6ff;color:#1d4ed8;font-size:.9rem;text-align:center}
-#scannerCard{position:sticky;top:0;z-index:50;padding:8px;box-shadow:0 4px 12px rgba(0,0,0,.15)}
-#scannerCard h2{margin:0 0 6px;font-size:1rem}
+#reader{width:100%;height:128px;border-radius:7px;overflow:hidden;border:none!important;background:#000;position:relative}
+#reader video{width:100%!important;height:128px!important;object-fit:cover!important;display:block}
+#reader__scan_region{min-height:128px!important;height:128px!important}
+#reader__dashboard{padding:3px 0 0!important}
+#reader__dashboard_section{padding:0!important}
+#reader__dashboard_section_csr button{padding:5px 8px!important;font-size:.78rem!important}
+#statusScanner{margin-top:5px;padding:6px 8px;border-radius:6px;background:#eff6ff;color:#1d4ed8;font-size:.78rem;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#scannerCard{position:sticky;top:0;z-index:50;padding:7px 8px;box-shadow:0 4px 12px rgba(0,0,0,.15)}
+#scannerCard h2{margin:0 0 5px;font-size:.9rem}
 #abas{display:flex;gap:6px;overflow-x:auto;margin-top:8px;padding-bottom:2px}
 .aba{flex:0 0 auto;padding:7px 12px;border-radius:20px;border:2px solid #cbd5e1;background:#fff;font-size:.85rem;font-weight:bold;color:var(--dark);cursor:pointer;white-space:nowrap}
 .aba.ativa{border-color:var(--primary);background:var(--primary);color:#fff}
@@ -43,6 +48,13 @@ input[type=file]{width:100%;padding:10px;border:2px dashed #cbd5e1;border-radius
 .status-sobra{border-left-color:var(--danger);background:#fee2e2}
 .status-vazio{color:#64748b;font-style:italic;text-align:center;padding:20px}
 .status-sobra .prod-qtd{background:var(--danger);color:#fff}
+.produto-item.destaque{
+  outline:3px solid var(--primary);
+  box-shadow:0 0 0 4px rgba(37,99,235,.16),0 5px 14px rgba(37,99,235,.18);
+  transform:scale(1.01);
+  scroll-margin-top:155px;
+  transition:outline .15s,box-shadow .15s,transform .15s;
+}
 #bloqueio-tela{display:none;position:fixed;inset:0;background:rgba(220,38,38,.95);z-index:9999;color:#fff;flex-direction:column;justify-content:center;align-items:center;padding:20px;text-align:center}
 #bloqueio-tela h1{font-size:2rem;margin-bottom:15px}
 #bloqueio-tela p{font-size:1.2rem;margin-bottom:30px;max-width:400px}
@@ -51,6 +63,14 @@ input[type=file]{width:100%;padding:10px;border:2px dashed #cbd5e1;border-radius
 .botoes-acao{position:fixed;bottom:0;left:0;width:100%;padding:12px;background:#fff;box-shadow:0 -4px 10px rgba(0,0,0,.05);display:flex;gap:10px}
 .btn{flex:1;padding:12px;border:none;border-radius:6px;font-weight:bold;font-size:1rem;color:#fff;cursor:pointer;text-align:center}
 .btn-success{background:var(--success)}.btn-danger{background:var(--danger)}
+.scanner-spacer{height:2px}
+@media (max-width:380px){
+  #reader,#reader video,#reader__scan_region{height:112px!important;min-height:112px!important}
+  #scannerCard{padding:5px 6px}
+  #statusScanner{font-size:.72rem;padding:5px 6px}
+  .produto-item{padding:10px}
+  .prod-nome{font-size:.9rem}
+}
 </style>
 </head>
 <body>
@@ -61,7 +81,7 @@ input[type=file]{width:100%;padding:10px;border:2px dashed #cbd5e1;border-radius
 </div>
 
 <div class="card" id="scannerCard" style="display:none">
-  <h2>📷 2. Scanner Ativo</h2>
+  <h2>📷 Scanner ativo — mire o código</h2>
   <div id="reader"></div>
   <div id="statusScanner">Preparando câmera...</div>
   <div id="abas"></div>
@@ -241,11 +261,26 @@ function renderLista() {
   $('listaProdutos').innerHTML = keys.length ? keys.map(itemHTML).join('') : '<p class="status-vazio">Nenhum XML carregado ainda.</p>';
 }
 
-function atualizarItem(k) {
+function atualizarItem(k, destacar = false) {
   const el = [...document.querySelectorAll('.produto-item')].find(e => e.dataset.k === k);
   if (el) el.outerHTML = itemHTML(k);
   renderResumo();
-  return [...document.querySelectorAll('.produto-item')].find(e => e.dataset.k === k);
+
+  const novo = [...document.querySelectorAll('.produto-item')].find(e => e.dataset.k === k);
+  if (novo && destacar) {
+    novo.classList.add('destaque');
+    setTimeout(() => novo.classList.remove('destaque'), 1800);
+  }
+  return novo;
+}
+
+function focarItemConferido(k) {
+  const el = atualizarItem(k, true);
+  if (!el) return;
+
+  requestAnimationFrame(() => {
+    el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
 }
 
 function renderResumo() {
@@ -304,7 +339,10 @@ async function iniciarScanner() {
     const F = Html5QrcodeSupportedFormats;
     scanner = new Html5QrcodeScanner('reader', {
       fps: 10,
-      qrbox: (w, h) => ({ width: Math.floor(Math.min(w * 0.85, 320)), height: Math.floor(Math.min(h * 0.45, 160)) }),
+      qrbox: (w, h) => ({
+        width: Math.floor(Math.min(w * 0.82, 290)),
+        height: Math.floor(Math.min(h * 0.68, 86))
+      }),
       aspectRatio: 1.777778,
       rememberLastUsedCamera: true,
       showTorchButtonIfSupported: true,
@@ -376,7 +414,7 @@ function onScanSuccess(texto) {
   emitirSom('sucesso');
   if (navigator.vibrate) navigator.vibrate(80);
   salvar();
-  atualizarItem(ref.key);
+  focarItemConferido(ref.key);
   $('statusScanner').innerText = `NF ${S.nota.numero || ''}: ✔ ${p.nome} — ${fmt(p.conferido)}/${fmt(p.esperado)}`;
 }
 
