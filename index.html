@@ -13,13 +13,13 @@ body{background:var(--light);color:var(--dark);padding:15px;padding-bottom:80px}
 h2{font-size:1.2rem;margin:15px 0 8px;display:flex;align-items:center;gap:8px}
 .card{background:#fff;padding:15px;border-radius:8px;box-shadow:0 2px 4px rgba(0,0,0,.05);margin-bottom:15px}
 input[type=file]{width:100%;padding:10px;border:2px dashed #cbd5e1;border-radius:6px;background:#fff;cursor:pointer}
-#reader{width:100%;height:128px;border-radius:7px;overflow:hidden;border:none!important;background:#000;position:relative}
-#reader video{width:100%!important;height:128px!important;object-fit:cover!important;display:block}
-#reader__scan_region{min-height:128px!important;height:128px!important}
+#reader{width:100%;height:180px;border-radius:8px;overflow:hidden;border:none!important;background:#000;min-height:180px}
+#reader video{width:100%!important;height:180px!important;object-fit:cover!important;display:block}
+#reader__scan_region{min-height:180px!important;height:180px!important}
 #reader__dashboard{padding:3px 0 0!important}
 #reader__dashboard_section{padding:0!important}
-#reader__dashboard_section_csr button{padding:5px 8px!important;font-size:.78rem!important}
-#statusScanner{margin-top:5px;padding:6px 8px;border-radius:6px;background:#eff6ff;color:#1d4ed8;font-size:.78rem;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#reader__dashboard_section_csr button{padding:5px 8px!important;font-size:.78rem}
+#statusScanner{margin-top:6px;padding:7px 9px;border-radius:6px;background:#eff6ff;color:#1d4ed8;font-size:.78rem;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #scannerCard{position:sticky;top:0;z-index:50;padding:7px 8px;box-shadow:0 4px 12px rgba(0,0,0,.15)}
 #scannerCard h2{margin:0 0 5px;font-size:.9rem}
 #abas{display:flex;gap:6px;overflow-x:auto;margin-top:8px;padding-bottom:2px}
@@ -33,6 +33,7 @@ input[type=file]{width:100%;padding:10px;border:2px dashed #cbd5e1;border-radius
 .barra i{display:block;height:100%;background:var(--success)}
 .filtro{display:flex;align-items:center;gap:8px;font-size:.85rem;margin-bottom:8px;color:#475569}
 .produto-item{padding:12px;border-radius:6px;background:#fff;margin-bottom:8px;border-left:5px solid #cbd5e1;display:flex;justify-content:space-between;align-items:center;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.produto-item.destaque{outline:3px solid var(--primary);box-shadow:0 0 0 4px rgba(37,99,235,.16),0 5px 14px rgba(37,99,235,.18);transform:scale(1.01);scroll-margin-top:205px;transition:outline .15s,box-shadow .15s,transform .15s}
 .oculto{display:none}
 .prod-info{flex:1;padding-right:10px}
 .prod-nome{font-weight:bold;font-size:.95rem;margin-bottom:2px}
@@ -48,13 +49,6 @@ input[type=file]{width:100%;padding:10px;border:2px dashed #cbd5e1;border-radius
 .status-sobra{border-left-color:var(--danger);background:#fee2e2}
 .status-vazio{color:#64748b;font-style:italic;text-align:center;padding:20px}
 .status-sobra .prod-qtd{background:var(--danger);color:#fff}
-.produto-item.destaque{
-  outline:3px solid var(--primary);
-  box-shadow:0 0 0 4px rgba(37,99,235,.16),0 5px 14px rgba(37,99,235,.18);
-  transform:scale(1.01);
-  scroll-margin-top:155px;
-  transition:outline .15s,box-shadow .15s,transform .15s;
-}
 #bloqueio-tela{display:none;position:fixed;inset:0;background:rgba(220,38,38,.95);z-index:9999;color:#fff;flex-direction:column;justify-content:center;align-items:center;padding:20px;text-align:center}
 #bloqueio-tela h1{font-size:2rem;margin-bottom:15px}
 #bloqueio-tela p{font-size:1.2rem;margin-bottom:30px;max-width:400px}
@@ -63,14 +57,7 @@ input[type=file]{width:100%;padding:10px;border:2px dashed #cbd5e1;border-radius
 .botoes-acao{position:fixed;bottom:0;left:0;width:100%;padding:12px;background:#fff;box-shadow:0 -4px 10px rgba(0,0,0,.05);display:flex;gap:10px}
 .btn{flex:1;padding:12px;border:none;border-radius:6px;font-weight:bold;font-size:1rem;color:#fff;cursor:pointer;text-align:center}
 .btn-success{background:var(--success)}.btn-danger{background:var(--danger)}
-.scanner-spacer{height:2px}
-@media (max-width:380px){
-  #reader,#reader video,#reader__scan_region{height:112px!important;min-height:112px!important}
-  #scannerCard{padding:5px 6px}
-  #statusScanner{font-size:.72rem;padding:5px 6px}
-  .produto-item{padding:10px}
-  .prod-nome{font-size:.9rem}
-}
+@media (max-width:380px){#reader,#reader__scan_region{height:165px!important;min-height:165px!important}#reader video{height:165px!important}.produto-item{padding:10px}.prod-nome{font-size:.9rem}}
 </style>
 </head>
 <body>
@@ -265,23 +252,17 @@ function atualizarItem(k, destacar = false) {
   const el = [...document.querySelectorAll('.produto-item')].find(e => e.dataset.k === k);
   if (el) el.outerHTML = itemHTML(k);
   renderResumo();
-
   const novo = [...document.querySelectorAll('.produto-item')].find(e => e.dataset.k === k);
-  if (novo && destacar) {
+  if (destacar && novo) {
+    document.querySelectorAll('.produto-item.destaque').forEach(x => x.classList.remove('destaque'));
     novo.classList.add('destaque');
+    requestAnimationFrame(() => novo.scrollIntoView({ behavior:'smooth', block:'start' }));
     setTimeout(() => novo.classList.remove('destaque'), 1800);
   }
   return novo;
 }
 
-function focarItemConferido(k) {
-  const el = atualizarItem(k, true);
-  if (!el) return;
-
-  requestAnimationFrame(() => {
-    el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  });
-}
+function focarItemConferido(k) { atualizarItem(k, true); }
 
 function renderResumo() {
   renderAbas();
@@ -339,10 +320,7 @@ async function iniciarScanner() {
     const F = Html5QrcodeSupportedFormats;
     scanner = new Html5QrcodeScanner('reader', {
       fps: 10,
-      qrbox: (w, h) => ({
-        width: Math.floor(Math.min(w * 0.82, 290)),
-        height: Math.floor(Math.min(h * 0.68, 86))
-      }),
+      qrbox: (w, h) => ({ width: Math.floor(Math.min(w * 0.85, 320)), height: Math.floor(Math.min(h * 0.70, 120)) }),
       aspectRatio: 1.777778,
       rememberLastUsedCamera: true,
       showTorchButtonIfSupported: true,
