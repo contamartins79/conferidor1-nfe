@@ -10,8 +10,8 @@
 <style>
 :root{--primary:#2563eb;--success:#16a34a;--warning:#ca8a04;--danger:#dc2626;--dark:#1e293b;--light:#f8fafc}
 *{box-sizing:border-box;margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
-body{background:var(--light);color:var(--dark);padding:15px;padding-bottom:80px}
-h2{font-size:1.2rem;margin:15px 0 8px;display:flex;align-items:center;gap:8px}
+html,body{height:100%;overflow:hidden}body{background:var(--light);color:var(--dark);padding:8px 8px 78px;display:flex;flex-direction:column;min-height:100vh;overflow:hidden}
+h2{font-size:1.2rem;margin:8px 0 6px;display:flex;align-items:center;gap:8px}
 .card{background:#fff;padding:15px;border-radius:8px;box-shadow:0 2px 4px rgba(0,0,0,.05);margin-bottom:15px}
 input[type=file]{width:100%;padding:10px;border:2px dashed #cbd5e1;border-radius:6px;background:#fff;cursor:pointer}
 #reader{width:100%;height:240px;border-radius:8px;overflow:hidden;border:none!important;background:#000;min-height:240px}
@@ -21,23 +21,27 @@ input[type=file]{width:100%;padding:10px;border:2px dashed #cbd5e1;border-radius
 #reader__dashboard_section{padding:0!important}
 #reader__dashboard_section_csr button{padding:5px 8px!important;font-size:.78rem}
 #statusScanner{margin-top:6px;padding:7px 9px;border-radius:6px;background:#eff6ff;color:#1d4ed8;font-size:.78rem;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-#scannerCard{position:sticky;top:0;z-index:50;padding:7px 8px;box-shadow:0 4px 12px rgba(0,0,0,.15)}
+#scannerCard{flex:0 0 auto;z-index:50;padding:7px 8px;box-shadow:0 4px 12px rgba(0,0,0,.15);margin-bottom:6px}
 #scannerCard h2{margin:0 0 5px;font-size:.9rem}
 #abas{display:flex;gap:6px;overflow-x:auto;margin-top:8px;padding-bottom:2px}
 .aba{flex:0 0 auto;padding:7px 12px;border-radius:20px;border:2px solid #cbd5e1;background:#fff;font-size:.85rem;font-weight:bold;color:var(--dark);cursor:pointer;white-space:nowrap}
 .aba.ativa{border-color:var(--primary);background:var(--primary);color:#fff}
 .aba.ok{border-color:var(--success)}
 .aba.ativa.ok{background:var(--success)}
-#notaInfo{font-size:.9rem;word-break:break-all}
-#resumo{font-size:.95rem}
-.barra{height:8px;background:#e2e8f0;border-radius:4px;margin:8px 0;overflow:hidden}
-.barra i{display:block;height:100%;background:var(--success)}
-.filtro{display:flex;align-items:center;gap:8px;font-size:.85rem;margin-bottom:8px;color:#475569}
-.produto-item{padding:12px;border-radius:6px;background:#fff;margin-bottom:8px;border-left:5px solid #cbd5e1;display:flex;justify-content:space-between;align-items:center;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+#notaInfo{display:none}
+#resumo{font-size:.82rem;padding:5px 12px;margin:0 0 5px;box-shadow:none;background:transparent}
+.resumo-linha{display:flex;align-items:center;justify-content:space-between;gap:10px;line-height:1.1;margin-bottom:6px}
+.resumo-numeros{font-weight:700;color:#334155;white-space:nowrap}
+.resumo-nf{font-size:.7rem;color:#64748b;font-weight:500}
+.filtro{margin:0;white-space:nowrap;font-size:.75rem;color:#475569;display:flex;align-items:center;gap:5px;line-height:1}
+.filtro input{width:16px;height:16px;margin:0;flex:0 0 16px;vertical-align:middle}
+.barra{height:6px;background:#e2e8f0;border-radius:4px;margin:0 12px;overflow:hidden}
+.barra i{display:block;height:100%;background:var(--success);transition:width .2s ease}
+.produto-item{padding:11px 12px;border-radius:6px;background:#fff;margin-bottom:8px;border-left:5px solid #cbd5e1;display:flex;justify-content:space-between;align-items:center;box-shadow:0 1px 3px rgba(0,0,0,.05)}
 .produto-item.destaque{outline:3px solid var(--primary);box-shadow:0 0 0 4px rgba(37,99,235,.16),0 5px 14px rgba(37,99,235,.18);transform:scale(1.01);scroll-margin-top:265px;transition:outline .15s,box-shadow .15s,transform .15s}
 .oculto{display:none}
 .prod-info{flex:1;padding-right:10px}
-.prod-nome{font-weight:bold;font-size:.95rem;margin-bottom:2px}
+.prod-nome{font-weight:bold;font-size:1rem;margin-bottom:3px}
 .prod-sub{font-size:.8rem;color:#64748b}
 .prod-sub b{color:var(--warning)}
 .ctrl{display:flex;align-items:center;gap:6px}
@@ -48,7 +52,7 @@ input[type=file]{width:100%;padding:10px;border:2px dashed #cbd5e1;border-radius
 .status-concluido{border-left-color:var(--success);background:#dcfce7}
 .status-concluido .prod-qtd{background:var(--success);color:#fff}
 .status-sobra{border-left-color:var(--danger);background:#fee2e2}
-.status-vazio{color:#64748b;font-style:italic;text-align:center;padding:20px}
+.status-vazio{color:#64748b;text-align:center;padding:28px 20px}.inicio-icone{font-size:2.7rem;line-height:1;margin-bottom:9px;filter:grayscale(.15)}.inicio-titulo{font-size:1.15rem;font-weight:800;color:#334155;font-style:normal;letter-spacing:.1px}.inicio-sub{font-size:.76rem;color:#94a3b8;margin-top:6px;line-height:1.4;font-style:normal}
 .status-sobra .prod-qtd{background:var(--danger);color:#fff}
 #bloqueio-tela{display:none;position:fixed;inset:0;background:rgba(220,38,38,.95);z-index:9999;color:#fff;flex-direction:column;justify-content:center;align-items:center;padding:20px;text-align:center}
 #bloqueio-tela h1{font-size:2rem;margin-bottom:15px}
@@ -58,7 +62,7 @@ input[type=file]{width:100%;padding:10px;border:2px dashed #cbd5e1;border-radius
 .botoes-acao{position:fixed;bottom:0;left:0;width:100%;padding:12px;background:#fff;box-shadow:0 -4px 10px rgba(0,0,0,.05);display:flex;gap:10px}
 .btn{flex:1;padding:12px;border:none;border-radius:6px;font-weight:bold;font-size:1rem;color:#fff;cursor:pointer;text-align:center}
 .btn-success{background:var(--success)}.btn-danger{background:var(--danger)}
-@media (max-width:380px){#reader,#reader__scan_region{height:220px!important;min-height:220px!important}#reader video{height:220px!important}.produto-item{padding:10px}.prod-nome{font-size:.9rem}}
+@media (max-width:380px){body{padding:6px 6px 76px}#reader,#reader__scan_region{height:220px!important;min-height:220px!important}#reader video{height:220px!important}.produto-item{padding:10px}.prod-nome{font-size:.9rem}}
 
 .produto-item{align-items:flex-start}
 .prod-main{min-width:0}
@@ -70,8 +74,7 @@ input[type=file]{width:100%;padding:10px;border:2px dashed #cbd5e1;border-radius
 .lote-info{font-size:.72rem;color:#475569;margin-top:3px;line-height:1.3}
 .lote-info b{color:#1d4ed8}
 .nf-resumo{font-size:.72rem;color:#64748b;margin-top:2px}
-#notaInfo,#resumo{display:none}
-#listaProdutos{padding-bottom:90px}
+#listaProdutos{flex:1 1 auto;min-height:0;overflow-y:auto;overflow-x:hidden;padding:0 2px 90px;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
 #xmlInput{display:none}
 .botoes-acao{z-index:100;flex-wrap:wrap}
 .btn-secondary{background:#2563eb}
@@ -81,6 +84,25 @@ input[type=file]{width:100%;padding:10px;border:2px dashed #cbd5e1;border-radius
 #seletorNF h3{margin-bottom:12px;font-size:1rem}
 #seletorNF button{width:100%;padding:12px;margin-top:8px;border:1px solid #cbd5e1;border-radius:8px;background:#f8fafc;text-align:left;font-weight:700}
 #seletorNF .cancelar{background:#e2e8f0;text-align:center}
+
+
+/* ---------- Modais de confirmação ---------- */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(15,23,42,.72);z-index:11000;align-items:center;justify-content:center;padding:18px}
+.modal-box{width:100%;max-width:420px;background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 12px 35px rgba(0,0,0,.35);animation:modalIn .16s ease-out}
+@keyframes modalIn{from{transform:scale(.96);opacity:.5}to{transform:scale(1);opacity:1}}
+.modal-head{padding:16px 18px;color:#fff;font-weight:800;font-size:1.05rem;text-align:center}
+.modal-head.red{background:var(--danger)}.modal-head.blue{background:var(--primary)}.modal-head.orange{background:#ea580c}
+.modal-body{padding:18px;text-align:center;color:var(--dark)}
+.modal-body p{margin-bottom:12px;line-height:1.4}
+.modal-product{font-weight:800;font-size:1rem;margin:6px 0 12px}
+.modal-number{font-size:1.45rem;font-weight:900;margin:8px 0;color:var(--danger)}
+.modal-lote-label{font-size:.75rem;text-transform:uppercase;color:#64748b;font-weight:800;margin-top:5px}
+.modal-lote-value{font-size:2.05rem;font-weight:900;letter-spacing:.5px;margin:4px 0 14px;color:#1d4ed8;word-break:break-all}
+.modal-input{width:100%;padding:12px;border:2px solid #cbd5e1;border-radius:9px;font-size:1.05rem;text-align:center;font-weight:700;margin:6px 0 14px}
+.modal-actions{display:flex;gap:9px;padding:0 18px 18px}
+.modal-actions button{flex:1;border:0;border-radius:9px;padding:12px 9px;font-weight:800;font-size:.92rem;cursor:pointer}
+.modal-cancel{background:#e2e8f0;color:#334155}.modal-confirm{background:var(--success);color:#fff}.modal-blue{background:var(--primary);color:#fff}.modal-orange{background:#ea580c;color:#fff}
+.modal-help{font-size:.78rem;color:#64748b;margin-top:6px}
 
 </style>
 </head>
@@ -92,17 +114,47 @@ input[type=file]{width:100%;padding:10px;border:2px dashed #cbd5e1;border-radius
   <div id="statusScanner">Preparando câmera...</div>
 </div>
 
-<div class="card" id="notaInfo"></div>
-<div class="card" id="resumo"></div>
-
-<h2>📦 Produtos da conferência</h2>
-<label class="filtro"><input type="checkbox" id="soPend"> Mostrar só pendentes</label>
-<div id="listaProdutos"><p class="status-vazio">Nenhum XML carregado ainda.</p></div>
+<div id="resumo"></div>
+<div id="listaProdutos"><div class="status-vazio"><div class="inicio-icone">🧾</div><div class="inicio-titulo">Conferidor NF-e Portátil</div><div class="inicio-sub">Importe seu arquivo XML pelo botão verde abaixo para começar.</div></div></div>
 
 <div id="bloqueio-tela">
   <h1 id="blq-titulo"></h1>
   <p id="blq-msg"></p>
   <button onclick="liberarTela()">Liberar e Continuar</button>
+</div>
+
+<div id="modalExcedente" class="modal-overlay">
+  <div class="modal-box">
+    <div class="modal-head red">⚠️ LIMITE ESTOURADO</div>
+    <div class="modal-body">
+      <div id="excProduto" class="modal-product"></div>
+      <p id="excInfo"></p>
+      <div class="modal-number" id="excQtd"></div>
+      <p><b>Esta leitura realmente é um excedente?</b></p>
+    </div>
+    <div class="modal-actions">
+      <button class="modal-cancel" onclick="cancelarExcedente()">Não, corrigir</button>
+      <button class="modal-confirm" onclick="confirmarExcedente()">Sim, confirmar excedente</button>
+    </div>
+  </div>
+</div>
+
+<div id="modalLote" class="modal-overlay">
+  <div class="modal-box">
+    <div id="loteHead" class="modal-head blue">📦 CONFIRMAÇÃO DE LOTE</div>
+    <div class="modal-body">
+      <div id="loteProduto" class="modal-product"></div>
+      <div id="loteLabel" class="modal-lote-label">LOTE DA NF</div>
+      <div id="loteValor" class="modal-lote-value">—</div>
+      <p id="loteTexto"></p>
+      <input id="loteInput" class="modal-input" type="text" autocomplete="off" placeholder="Digite o lote encontrado">
+      <div class="modal-help">O mesmo lote será mantido para as próximas leituras até você alterá-lo.</div>
+    </div>
+    <div class="modal-actions">
+      <button id="loteDiferente" class="modal-orange" onclick="modoLoteDiferente()">✎ Lote diferente / corrigir</button>
+      <button id="loteConfirmar" class="modal-blue" onclick="confirmarLoteModal()">✓ Confirmar lote</button>
+    </div>
+  </div>
 </div>
 
 <div class="botoes-acao">
@@ -191,6 +243,7 @@ function lerXML(txt) {
   for (const d of dets) {
     const n = d.getAttribute('nItem') || '?';
     const nome = tag(d, 'xProd') || 'Produto sem nome';
+    const loteNF = tag(d, 'nLote') || '';
     const qCom = parseFloat(tag(d, 'qCom')) || 0, qTrib = parseFloat(tag(d, 'qTrib')) || 0;
     const e1 = norm(tag(d, 'cEAN')), e2 = norm(tag(d, 'cEANTrib'));
     const passos = {};
@@ -209,7 +262,8 @@ function lerXML(txt) {
     }
 
     // Mesmo código em mais de um item da nota: soma as quantidades.
-    const siglaLote = detectarLote(nome); const it = itens[key] || (itens[key] = { nome, esperado: 0, conferido: 0, manual: !(e1 || e2), ean: e1 || e2 || '', controlaLote: !!siglaLote, siglaLote, lotes: {}, loteAtual: '' });
+    const siglaLote = detectarLote(nome); const it = itens[key] || (itens[key] = { nome, esperado: 0, conferido: 0, manual: !(e1 || e2), ean: e1 || e2 || '', controlaLote: !!siglaLote, siglaLote, loteNF, lotes: {}, loteAtual: '' });
+    if(loteNF && !it.loteNF) it.loteNF=loteNF;
     it.esperado = round(it.esperado + esperado);
     for (const c in passos) codigos[c] = { key, passo: passos[c] };
   }
@@ -288,12 +342,12 @@ function itemHTML(id){
   const sig=p.siglaLote || detectarLote(p.nome);
   const tagLote=p.controlaLote ? (sig ? `<span class="lote-tag">🔵 LOTE ${esc(sig)}</span>` : '<span class="lote-tag">🔵 LOTE</span>') : '';
   const btnLote=`<button class="lote-btn${p.controlaLote?' ativo':''}" data-a="lote">${p.controlaLote?'✓ Lote':'+ Lote'}</button>`;
-  const loteAtual=p.loteAtual ? ` · atual: <b>${esc(p.loteAtual)}</b>` : '';
+  const loteAtual=p.loteAtual ? ` · atual: <b>${esc(p.loteAtual)}</b>` : (p.loteNF ? ` · NF: <b>${esc(p.loteNF)}</b>` : '');
   return `<div class="produto-item ${c}" data-k="${esc(id)}">
     <div class="prod-info prod-main"><div class="prod-nome">${esc(p.nome)}</div>
       <div class="prod-sub">${p.manual ? '<b>SEM GTIN – conferir manualmente</b>' : 'EAN: ' + esc(p.ean)}</div>
       <div class="prod-meta"><span class="nf-tag">NF ${esc(nt.nota.numero || '?')}</span>${tagLote}${btnLote}</div>
-      ${resumoLotes(p)}
+      ${loteAtual?`<div class="lote-info">${loteAtual}</div>`:''}${resumoLotes(p)}
     </div>
     <div class="ctrl"><button class="mini" data-a="-">−</button>
       <div class="prod-qtd" data-a="e">${fmt(p.conferido)}/${fmt(p.esperado)}</div>
@@ -301,7 +355,7 @@ function itemHTML(id){
 }
 function renderLista(){
   const arr=todosItens();
-  $('listaProdutos').innerHTML=arr.length ? arr.map(x=>itemHTML(x.id)).join('') : '<p class="status-vazio">Nenhum XML carregado ainda.</p>';
+  $('listaProdutos').innerHTML=arr.length ? arr.map(x=>itemHTML(x.id)).join('') : '<div class="status-vazio"><div class="inicio-icone">🧾</div><div class="inicio-titulo">Conferidor NF-e Portátil</div><div class="inicio-sub">Importe seu arquivo XML pelo botão verde abaixo para começar.</div></div>';
 }
 function atualizarItem(id,destacar=false){
   const el=[...document.querySelectorAll('.produto-item')].find(e=>e.dataset.k===id);
@@ -311,7 +365,13 @@ function atualizarItem(id,destacar=false){
   if(destacar&&novo){
     document.querySelectorAll('.produto-item.destaque').forEach(x=>x.classList.remove('destaque'));
     novo.classList.add('destaque');
-    requestAnimationFrame(()=>novo.scrollIntoView({behavior:'smooth',block:'start'}));
+    // Não usa scrollIntoView: isso moveria a página e poderia esconder a câmera.
+    // A lista possui rolagem própria e só faz um ajuste mínimo dentro dela.
+    const lista=$('listaProdutos');
+    const top=novo.offsetTop, bottom=top+novo.offsetHeight;
+    const viewTop=lista.scrollTop, viewBottom=viewTop+lista.clientHeight-12;
+    if(top<viewTop) lista.scrollTop=Math.max(0,top-12);
+    else if(bottom>viewBottom) lista.scrollTop=Math.max(0,bottom-lista.clientHeight+12);
     setTimeout(()=>novo.classList.remove('destaque'),1800);
   }
   return novo;
@@ -319,29 +379,31 @@ function atualizarItem(id,destacar=false){
 function focarItemConferido(id){ atualizarItem(id,true); }
 function renderResumo(){
   const arr=todosItens(), notas=B.notas;
-  $('notaInfo').style.display=notas.length?'block':'none';
-  $('resumo').style.display=notas.length?'block':'none';
-  if(!notas.length){ $('notaInfo').innerHTML=''; $('resumo').innerHTML=''; return; }
-  $('notaInfo').innerHTML=`<b>${notas.length} NF-e carregada${notas.length>1?'s':''}</b> · ${notas.map(n=>`NF ${esc(n.nota.numero||'?')} — ${esc(n.nota.emit||'emitente não informado')}`).join(' · ')}`;
-  const total=arr.reduce((a,x)=>a+x.p.esperado,0), conf=arr.reduce((a,x)=>a+Math.min(x.p.conferido,x.p.esperado),0), ok=arr.filter(x=>completo(x.p)).length;
-  const pct=total?Math.round(conf/total*100):0, lot=arr.filter(x=>x.p.controlaLote).length;
-  $('resumo').innerHTML=`<b>${ok}/${arr.length}</b> itens concluídos · <b>${fmt(conf)}/${fmt(total)}</b> unidades<div class="barra"><i style="width:${pct}%"></i></div><small>${notas.length} NF-e · ${lot} produto(s) com controle de lote</small>`;
+  const resumo=$('resumo');
+  if(!notas.length){ resumo.innerHTML=''; return; }
+  const total=arr.reduce((a,x)=>a+x.p.esperado,0);
+  const conf=arr.reduce((a,x)=>a+Math.min(x.p.conferido,x.p.esperado),0);
+  const ok=arr.filter(x=>completo(x.p)).length;
+  const pct=total?Math.round(conf/total*100):0;
+  resumo.innerHTML=`<div class="resumo-linha"><span class="resumo-numeros">${ok}/${arr.length} itens · ${fmt(conf)}/${fmt(total)} un.</span><label class="filtro"><input type="checkbox" id="soPend" ${$('soPend')?.checked?'checked':''}> Só pendentes</label></div><div class="barra"><i style="width:${pct}%"></i></div><div class="resumo-nf">${notas.length} NF-e</div>`;
+  const filtro=$('soPend');
+  if(filtro) filtro.addEventListener('change',renderLista);
 }
-function renderTudo(){renderLista();renderResumo();}
-$('soPend').addEventListener('change',renderLista);
+
+function renderTudo(){renderResumo();renderLista();}
 
 /* ---------- Ajuste manual ---------- */
 $('listaProdutos').addEventListener('click',e=>{
   const b=e.target.closest('[data-a]'), row=e.target.closest('.produto-item'); if(!b||!row)return;
   const id=row.dataset.k, obj=obterItem(id); if(!obj)return; const {p}=obj, a=b.dataset.a;
   if(a==='lote'){
-    p.controlaLote=!p.controlaLote;
-    if(p.controlaLote&&!p.lotes)p.lotes={};
-    salvar(); atualizarItem(id); return;
+    if(!p.controlaLote){p.controlaLote=true;if(!p.lotes)p.lotes={};salvar();abrirModalLote(obj,()=>atualizarItem(id));}
+    else trocarLote(id);
+    return;
   }
   if(a==='+'){
-    if(p.conferido+1>p.esperado+EPS){registrarNo(obj,'EXCEDENTE',p.ean||id,p.nome);bloquear('⚠️ LIMITE ESTOURADO',`${esc(p.nome)}<br>Já foram conferidas as ${fmt(p.esperado)} unidades.`);return;}
-    if(p.controlaLote && !definirLoteSeNecessario(obj)) return;
+    if(p.conferido+1>p.esperado+EPS){abrirModalExcedente(obj,1,p.ean||id);return;}
+    if(p.controlaLote && !p.loteAtual){abrirModalLote(obj,()=>{p.conferido=round(p.conferido+1);registrarLoteSeControlado(p,1);salvar();atualizarItem(id,true);});return;}
     p.conferido=round(p.conferido+1); registrarLoteSeControlado(p,1);
   }else if(a==='-'){
     if(p.conferido<=EPS)return;
@@ -349,21 +411,54 @@ $('listaProdutos').addEventListener('click',e=>{
   }else{
     const v=prompt(`Quantidade conferida de "${p.nome}" (esperado: ${fmt(p.esperado)}):`,fmt(p.conferido)); if(v===null)return;
     const n=parseFloat(v.replace(',','.')); if(isNaN(n)||n<0){alert('Quantidade inválida.');return;}
-    if(n>p.esperado+EPS){registrarNo(obj,'EXCEDENTE',p.ean||id,p.nome);bloquear('⚠️ LIMITE ESTOURADO',`${esc(p.nome)}<br>Quantidade acima do previsto.`);return;}
-    if(p.controlaLote && n>p.conferido && !definirLoteSeNecessario(obj)) return;
+    if(n>p.esperado+EPS){abrirModalExcedente(obj,round(n-p.esperado),p.ean||id);return;}
+    if(p.controlaLote && n>p.conferido && !p.loteAtual){abrirModalLote(obj,()=>{const dif=round(n-p.conferido);p.conferido=round(n);if(dif>EPS)registrarLoteSeControlado(p,dif);salvar();atualizarItem(id);});return;}
     const dif=round(n-p.conferido); p.conferido=round(n); if(dif>EPS) registrarLoteSeControlado(p,dif); else if(dif< -EPS) ajustarUltimoLote(p,-dif);
   }
   salvar(); atualizarItem(id);
 });
 
-function definirLoteSeNecessario(obj){
+let lotePendente=null;
+function abrirModalLote(obj,callback){
+  const p=obj.p; lotePendente={obj,callback};
+  $('loteProduto').innerText=p.nome;
+  const nfLote=p.loteNF||'';
+  const atual=p.loteAtual||'';
+  const exibido=atual||nfLote;
+  $('loteHead').className='modal-head '+(atual?'blue':(nfLote?'blue':'orange'));
+  $('loteLabel').innerText=atual?'LOTE ATUAL':(nfLote?'LOTE INFORMADO NA NF':'LOTE DA EMBALAGEM');
+  $('loteValor').innerText=exibido||'Não informado na NF';
+  $('loteTexto').innerText=atual?'Este lote continuará sendo usado nas próximas leituras. Altere somente se a embalagem trouxer outro lote.':(nfLote?'Confirme o lote da NF ou informe um lote diferente, se necessário.':'A NF não informa o lote. Digite o lote encontrado na embalagem.');
+  $('loteInput').value=atual||nfLote||'';
+  $('loteInput').style.display=(nfLote && !atual)?'none':'block';
+  $('loteDiferente').style.display='block';
+  $('loteDiferente').innerText=nfLote?'✎ Lote diferente / corrigir':'✎ Digitar lote';
+  $('loteConfirmar').innerText=nfLote?'✓ Confirmar lote':'✓ Confirmar lote';
+  $('modalLote').style.display='flex';
+  if(!nfLote || atual) setTimeout(()=>{if($('loteInput').style.display!=='none')$('loteInput').focus()},80);
+}
+function modoLoteDiferente(){
+  $('loteInput').style.display='block';
+  $('loteInput').value=lotePendente?.obj?.p?.loteAtual||lotePendente?.obj?.p?.loteNF||'';
+  $('loteLabel').innerText='LOTE ENCONTRADO NA EMBALAGEM';
+  $('loteValor').innerText='Informe o lote abaixo';
+  $('loteInput').focus();
+}
+function fecharModalLote(){ $('modalLote').style.display='none'; lotePendente=null; }
+function confirmarLoteModal(){
+  if(!lotePendente)return;
+  const p=lotePendente.obj.p;
+  const valor=($('loteInput').style.display==='none'?($('loteValor').innerText||p.loteNF):$('loteInput').value).trim();
+  if(!valor || valor==='Não informado na NF' || valor==='Informe o lote abaixo'){alert('Informe um lote válido.');return;}
+  p.loteAtual=valor; if(!p.lotes)p.lotes={};
+  const pend=lotePendente; const cb=pend.callback; const id=pend.obj.id; fecharModalLote(); salvar(); atualizarItem(id); if(cb)cb();
+}
+function definirLoteSeNecessario(obj,callback){
   const p=obj.p;
   if(!p.controlaLote)return true;
   if(p.loteAtual)return true;
-  const lote=prompt(`Informe o lote de "${p.nome}"${p.siglaLote?' ('+p.siglaLote+')':''}:`,'');
-  if(lote===null)return false;
-  const v=lote.trim(); if(!v){alert('O lote é obrigatório para este produto.');return false;}
-  p.loteAtual=v; if(!p.lotes)p.lotes={}; return true;
+  abrirModalLote(obj,callback);
+  return false;
 }
 function registrarLoteSeControlado(p,q){ if(!p.controlaLote||q<=EPS)return; if(!p.loteAtual)return; if(!p.lotes)p.lotes={}; p.lotes[p.loteAtual]=round((p.lotes[p.loteAtual]||0)+q); }
 function ajustarUltimoLote(p,q){
@@ -371,7 +466,7 @@ function ajustarUltimoLote(p,q){
   let ch=p.loteAtual; if(ch&&p.lotes[ch]>EPS){p.lotes[ch]=round(Math.max(0,p.lotes[ch]-q));if(p.lotes[ch]<=EPS)delete p.lotes[ch];return;}
   const ls=Object.keys(p.lotes); for(let i=ls.length-1;i>=0;i--){const l=ls[i];if(p.lotes[l]>EPS){p.lotes[l]=round(Math.max(0,p.lotes[l]-q));if(p.lotes[l]<=EPS)delete p.lotes[l];break;}}
 }
-function trocarLote(id){ const obj=obterItem(id); if(!obj)return; const p=obj.p; const lote=prompt(`Novo lote para "${p.nome}":`,p.loteAtual||''); if(lote===null)return; const v=lote.trim();if(!v)return alert('Informe um lote válido.');p.loteAtual=v;if(!p.lotes)p.lotes={};salvar();atualizarItem(id); }
+function trocarLote(id){ const obj=obterItem(id); if(!obj)return; abrirModalLote(obj,()=>{atualizarItem(id);}); }
 
 /* ---------- Scanner ---------- */
 function mostrarScanner(){ $('scannerCard').style.display='block'; iniciarScanner(); }
@@ -396,11 +491,43 @@ function abrirSeletorNF(cands,callback){
   $('seletorNF').style.display='flex'; $('opcoesNF').onclick=e=>{const b=e.target.closest('button[data-i]');if(!b)return;const x=cands[+b.dataset.i];fecharSeletorNF();callback(x);};
 }
 function fecharSeletorNF(){$('seletorNF').style.display='none';}
+function concluirLeitura(obj,bruto,ref){
+  const p=obj.p;
+  p.conferido=round(p.conferido+ref.passo); registrarLoteSeControlado(p,ref.passo); emitirSom('sucesso');if(navigator.vibrate)navigator.vibrate(80);salvar();focarItemConferido(obj.id);$('statusScanner').innerText=`NF ${obj.nt.nota.numero||''}: ✔ ${p.nome} — ${fmt(p.conferido)}/${fmt(p.esperado)}`;
+}
 function processarLeitura(obj,bruto,ref){
   const p=obj.p;
-  if(p.conferido+ref.passo>p.esperado+EPS){registrarNo(obj,'EXCEDENTE',bruto,p.nome);bloquear('⚠️ LIMITE ESTOURADO',`${esc(p.nome)}<br>NF ${esc(obj.nt.nota.numero||'?')}<br>Já foram conferidas as ${fmt(p.esperado)} unidades.`);return;}
-  if(p.controlaLote && !definirLoteSeNecessario(obj)) return;
-  p.conferido=round(p.conferido+ref.passo); registrarLoteSeControlado(p,ref.passo); emitirSom('sucesso');if(navigator.vibrate)navigator.vibrate(80);salvar();focarItemConferido(obj.id);$('statusScanner').innerText=`NF ${obj.nt.nota.numero||''}: ✔ ${p.nome} — ${fmt(p.conferido)}/${fmt(p.esperado)}`;
+  if(p.conferido+ref.passo>p.esperado+EPS){abrirModalExcedente(obj,ref.passo,bruto,()=>concluirLeitura(obj,bruto,ref));return;}
+  if(p.controlaLote && !p.loteAtual){abrirModalLote(obj,()=>concluirLeitura(obj,bruto,ref));return;}
+  concluirLeitura(obj,bruto,ref);
+}
+let excedentePendente=null;
+function abrirModalExcedente(obj,quantidade,cod,callback){
+  excedentePendente={obj,quantidade,cod,callback};
+  const p=obj.p;
+  $('excProduto').innerText=p.nome;
+  $('excInfo').innerHTML=`NF ${esc(obj.nt.nota.numero||'?')} · Previsto: <b>${fmt(p.esperado)}</b> · Já conferido: <b>${fmt(p.conferido)}</b>`;
+  $('excQtd').innerText=`+${fmt(quantidade)} unidade${Math.abs(quantidade-1)<EPS?'':'s'}`;
+  $('modalExcedente').style.display='flex';
+}
+function cancelarExcedente(){
+  const x=excedentePendente; excedentePendente=null; $('modalExcedente').style.display='none';
+  if(navigator.vibrate)navigator.vibrate(50);
+}
+function confirmarExcedente(){
+  const x=excedentePendente; if(!x)return;
+  const obj=x.obj,p=obj.p,cb=x.callback;
+  if(cb){
+    // A função de continuidade faz o incremento da leitura e o registro do lote.
+    registrarNo(obj,'EXCEDENTE',x.cod,p.nome);
+    excedentePendente=null; $('modalExcedente').style.display='none'; cb();
+    return;
+  }
+  p.conferido=round(p.conferido+x.quantidade); registrarLoteSeControlado(p,x.quantidade);
+  registrarNo(obj,'EXCEDENTE',x.cod,p.nome);
+  emitirSom('sucesso');if(navigator.vibrate)navigator.vibrate([80,60,80]);
+  excedentePendente=null; $('modalExcedente').style.display='none'; salvar(); focarItemConferido(obj.id);
+  $('statusScanner').innerText=`NF ${obj.nt.nota.numero||''}: ⚠ Excedente confirmado — ${p.nome} — ${fmt(p.conferido)}/${fmt(p.esperado)}`;
 }
 function onScanSuccess(texto){
   if(bloqueado)return; const bruto=String(texto).trim();if(!bruto)return; const agora=Date.now();if(bruto===ultimo.cod&&agora-ultimo.t<INTERVALO_REPETICAO){ultimo={cod:bruto,t:agora};return}ultimo={cod:bruto,t:agora};
